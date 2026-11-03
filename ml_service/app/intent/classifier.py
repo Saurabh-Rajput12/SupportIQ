@@ -1,10 +1,10 @@
 import os
 import json
-import torch
+from pathlib import Path
 from typing import Dict, Any, List
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
+import torch
+from transformers import AutoTokenizer, AutoConfig, AutoModelForSequenceClassification
 
-DEFAULT_MODEL_DIR = "models/intent_classifier"
 FALLBACK_BASE_MODEL = "google-bert/bert-base-uncased"
 
 class IntentClassifier:
@@ -13,8 +13,9 @@ class IntentClassifier:
     Evaluates customer support ticket text and outputs intent prediction,
     softmax confidence score, and top-k candidates.
     """
-    def __init__(self, model_dir: str = DEFAULT_MODEL_DIR):
-        self.model_dir = model_dir
+    def __init__(self, model_dir: str = "models/intent_classifier"):
+        self.project_root = Path(__file__).resolve().parents[2]  # SupportIQ root
+        self.model_dir = str(self.project_root / "models" / "intent_classifier")
         self.device = "mps" if torch.backends.mps.is_available() else ("cuda" if torch.cuda.is_available() else "cpu")
         self.model = None
         self.tokenizer = None
@@ -22,47 +23,57 @@ class IntentClassifier:
         self.label2id = {}
         self._is_loaded = False
 
+    def _find_label_file(self) -> Path:
+        candidates = [
+            Path(self.model_dir) / "id2label.json",
+            self.project_root / "data" / "processed" / "banking77_id2label.json",
+            Path("data/processed/banking77_id2label.json"),
+            Path("../data/processed/banking77_id2label.json"),
+        ]
+        for c in candidates:
+            if c.exists():
+                return c
+        return None
+
     def load(self):
         if self._is_loaded:
             return
 
-        if os.path.exists(os.path.join(self.model_dir, "config.json")):
+        label_path = self._find_label_file()
+        if label_path and label_path.exists():
+            try:
+                with open(label_path, "r", encoding="utf-8") as f:
+                    raw_map = json.load(f)
+                    self.id2label = {int(k): v for k, v in raw_map.items()}
+                    self.label2id = {v: int(k) for k, v in self.id2label.items()}
+            except Exception as e:
+                print(f"[IntentClassifier] Warning reading labels: {e}")
+
+        num_labels = len(self.id2label) if self.id2label else 77
+
+        # Determine path
+        config_file = Path(self.model_dir) / "config.json"
+        if config_file.exists():
             path = self.model_dir
-            print(f"[IntentClassifier] Loading trained BERT checkpoint from {path}...")
+            print(f"[IntentClassifier] Loading trained checkpoint from {path}...")
         else:
             path = FALLBACK_BASE_MODEL
             print(f"[IntentClassifier] Trained checkpoint not found at {self.model_dir}, loading baseline {path}...")
 
         self.tokenizer = AutoTokenizer.from_pretrained(path)
 
-        # Load label mapping if present
-        label_file = os.path.join(self.model_dir, "id2label.json")
-        if not os.path.exists(label_file):
-            label_file = "data/processed/banking77_id2label.json"
+        # Explicitly configure num_labels via AutoConfig to prevent NoneType shape errors
+        config = AutoConfig.from_pretrained(
+            path,
+            num_labels=num_labels,
+            id2label=self.id2label if self.id2label else None,
+            label2id=self.label2id if self.label2id else None,
+        )
 
-        if os.path.exists(label_file):
-            with open(label_file, "r") as f:
-                raw_map = json.load(f)
-                self.id2label = {int(k): v for k, v in raw_map.items()}
-                self.label2id = {v: int(k) for k, v in self.id2label.items()}
-
-        num_labels = len(self.id2label) if self.id2label else 77
-
-        try:
-            self.model = AutoModelForSequenceClassification.from_pretrained(
-                path,
-                num_labels=num_labels,
-                id2label=self.id2label if self.id2label else None,
-                label2id=self.label2id if self.label2id else None,
-            )
-        except Exception as e:
-            print(f"[IntentClassifier] Notice: loading without strict weights: {e}")
-            self.model = AutoModelForSequenceClassification.from_pretrained(
-                FALLBACK_BASE_MODEL,
-                num_labels=num_labels,
-                id2label=self.id2label if self.id2label else None,
-                label2id=self.label2id if self.label2id else None,
-            )
+        self.model = AutoModelForSequenceClassification.from_pretrained(
+            path,
+            config=config,
+        )
 
         self.model.to(self.device)
         self.model.eval()
@@ -103,4 +114,3 @@ class IntentClassifier:
             "model_id": "supportiq-bert-banking77-v1",
             "is_confident": bool(top_pred["confidence"] >= 0.5),
         }
-
