@@ -103,3 +103,4 @@ class ReplyGenerator:
             return f"Hello,\n\n{opening}\n\nSummary of Case: {summary}\nAction Required: {action}\n\n{closing}"
         else:
             return f"Hello,\n\n{opening} {action}\n\n{closing}"
+

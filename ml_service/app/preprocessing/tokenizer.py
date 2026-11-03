@@ -35,3 +35,4 @@ class TokenizerService:
             "tokens": tokens,
             "token_count": len(encoded["input_ids"]),
         }
+

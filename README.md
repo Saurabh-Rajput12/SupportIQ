@@ -135,3 +135,4 @@ Navigate to `http://localhost:3000/` in any modern web browser.
 - Passwords are encrypted with `bcrypt` (10 rounds).
 - SQL statements use parameterized queries to prevent SQL injection.
 - Frontend renders user input with `textContent` / escaped templates to prevent XSS.
+

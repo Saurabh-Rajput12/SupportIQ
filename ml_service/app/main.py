@@ -100,3 +100,4 @@ def generate_reply(req: ReplyGenerateRequest):
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+

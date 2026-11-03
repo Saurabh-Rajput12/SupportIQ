@@ -11,3 +11,4 @@ router.post('/:replyId/approve', validate(approveReplySchema), replyController.a
 router.post('/:replyId/reject', validate(rejectReplySchema), replyController.rejectReply);
 
 module.exports = router;
+

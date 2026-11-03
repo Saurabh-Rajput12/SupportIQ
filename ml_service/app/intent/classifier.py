@@ -103,3 +103,4 @@ class IntentClassifier:
             "model_id": "supportiq-bert-banking77-v1",
             "is_confident": bool(top_pred["confidence"] >= 0.5),
         }
+

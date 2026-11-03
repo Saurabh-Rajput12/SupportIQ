@@ -34,3 +34,4 @@ class HistoryRepository {
 }
 
 module.exports = new HistoryRepository();
+

@@ -9,3 +9,4 @@ module.exports = {
   sessionSecret: process.env.SESSION_SECRET || 'dev-secret-key-change-in-prod-12345678',
   corsOrigins: (process.env.CORS_ORIGIN || 'http://127.0.0.1:5500,http://localhost:3000,http://127.0.0.1:3000').split(','),
 };
+

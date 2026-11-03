@@ -71,3 +71,4 @@ This log records non-negotiable architectural decisions, research evaluations, a
   - Reply generation uses controlled prompt templates isolating untrusted ticket text as data to prevent prompt injection.
   - Pluggable `ReplyProvider` architecture with deterministic, labeled `demo_fallback=true` when external LLM credentials are absent.
   - **Human-in-the-Loop Non-Negotiable Rule:** The system produces **drafts only**. Every reply must be reviewed, edited, approved, or rejected by an authenticated agent. Approval sets `sent=false`. Automatic email/message sending is prohibited.
+

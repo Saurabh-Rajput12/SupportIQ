@@ -37,3 +37,4 @@
 - **Total Records:** 26,872 question/answer pairs across 27 intents and 10 categories
 - **Fields:** `flags`, `instruction`, `category`, `intent`, `response`
 - **Recommended Use in SupportIQ:** Supplementary reference for few-shot prompt templates and realistic support reply tone. It is a hybrid curated/synthetic dataset, so it is not treated as ground truth for operational SLA or real-world customer outcomes.
+

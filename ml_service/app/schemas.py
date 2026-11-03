@@ -64,3 +64,4 @@ class ReplyGenerateRequest(BaseModel):
     priority: str
     summary: str
     prompt_type: str = "FEW_SHOT"
+

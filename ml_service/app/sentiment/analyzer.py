@@ -51,3 +51,4 @@ class SentimentAnalyzer:
             "model_id": self.model_id,
             "is_uncertain": is_uncertain,
         }
+

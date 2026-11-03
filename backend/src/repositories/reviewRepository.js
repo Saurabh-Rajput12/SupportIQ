@@ -24,3 +24,4 @@ class ReviewRepository {
 }
 
 module.exports = new ReviewRepository();
+

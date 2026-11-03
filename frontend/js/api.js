@@ -14,6 +14,25 @@ class ApiClient {
     }
   }
 
+  showToast(message, type = 'info') {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+
+    const toast = document.createElement('div');
+    toast.className = `toast-msg ${type}`;
+    const icon = type === 'success' ? '✓' : (type === 'error' ? '✕' : 'ℹ');
+    toast.innerHTML = `<span><strong>${icon}</strong></span><span>${escapeHtml(message)}</span>`;
+
+    container.appendChild(toast);
+
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(8px)';
+      toast.style.transition = 'all 0.25s ease';
+      setTimeout(() => toast.remove(), 250);
+    }, 3500);
+  }
+
   async request(endpoint, options = {}) {
     const headers = {
       'Content-Type': 'application/json',
@@ -156,6 +175,16 @@ class ApiClient {
   async getDistributions() {
     return this.request('/analytics/distributions');
   }
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 
 window.api = new ApiClient();

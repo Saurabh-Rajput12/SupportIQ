@@ -9,3 +9,4 @@ router.get('/overview', analyticsController.getOverview);
 router.get('/distributions', analyticsController.getDistributions);
 
 module.exports = router;
+

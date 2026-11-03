@@ -92,3 +92,4 @@ def get_pipeline() -> AnalysisPipeline:
     if _pipeline_instance is None:
         _pipeline_instance = AnalysisPipeline()
     return _pipeline_instance
+

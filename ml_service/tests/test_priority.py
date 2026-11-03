@@ -34,3 +34,4 @@ def test_priority_low_impact():
     )
     assert result["label"] == "LOW"
     assert "LOW_IMPACT_INFORMATION" in result["reasons"]
+

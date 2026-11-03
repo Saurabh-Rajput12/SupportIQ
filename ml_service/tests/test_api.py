@@ -81,3 +81,4 @@ def test_full_analyze_endpoint(client):
     assert "reply" in data
     assert data["priority"]["source"] == "rule_based"
     assert data["processing_ms"] >= 0
+

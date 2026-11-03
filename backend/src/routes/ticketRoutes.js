@@ -16,3 +16,4 @@ router.get('/:id/history', ticketController.getHistory);
 router.post('/:id/replies/regenerate', replyController.regenerateReply);
 
 module.exports = router;
+

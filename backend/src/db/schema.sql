@@ -93,3 +93,4 @@ CREATE INDEX IF NOT EXISTS idx_tickets_priority ON ticket_analysis(priority_labe
 CREATE INDEX IF NOT EXISTS idx_analysis_ticket ON ticket_analysis(ticket_id, run_number);
 CREATE INDEX IF NOT EXISTS idx_replies_ticket ON generated_replies(ticket_id, version);
 CREATE INDEX IF NOT EXISTS idx_history_ticket ON ticket_history(ticket_id, created_at);
+

@@ -19,7 +19,7 @@
         <div class="brand-icon">S</div>
         <div>
           <h1>SupportIQ</h1>
-          <span class="brand-badge">Agentic MCA NLP</span>
+          <span class="brand-badge">MCA NLP Pipeline</span>
         </div>
       </div>
 
@@ -39,7 +39,7 @@
         <li class="nav-item">
           <button onclick="openCreateTicketModal()">
             <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
-            Create Ticket
+            + Create Ticket
           </button>
         </li>
         <li class="nav-item" data-view="review">
@@ -66,7 +66,7 @@
         <div class="agent-profile">
           <div class="agent-avatar">AG</div>
           <div>
-            <div style="font-weight:600; color:#f8fafc;">agent@supportiq.local</div>
+            <div style="font-weight:700; color:#f8fafc;">agent@supportiq.local</div>
             <div style="font-size:0.7rem; color:#94a3b8;">Human-in-the-Loop Agent</div>
           </div>
         </div>
@@ -97,7 +97,7 @@
             <div class="kpi-card">
               <div class="kpi-title">Total Ingested</div>
               <div id="kpi-total" class="kpi-value">-</div>
-              <div class="kpi-meta">All-time tickets recorded</div>
+              <div class="kpi-meta">All-time tickets in database</div>
             </div>
             <div class="kpi-card">
               <div class="kpi-title">Open Queue</div>
@@ -106,22 +106,22 @@
             </div>
             <div class="kpi-card">
               <div class="kpi-title">Needs Review</div>
-              <div id="kpi-review" class="kpi-value">-</div>
-              <div class="kpi-meta">Drafts awaiting human agent</div>
+              <div id="kpi-review" class="kpi-value" style="color:#d97706;">-</div>
+              <div class="kpi-meta">Drafts awaiting agent review</div>
             </div>
             <div class="kpi-card">
               <div class="kpi-title">Critical & High</div>
               <div style="display:flex; gap:0.5rem; align-items:baseline;">
                 <span id="kpi-critical" class="kpi-value text-danger">-</span>
-                <span style="color:#94a3b8;">/</span>
+                <span style="color:#94a3b8; font-size:1.4rem;">/</span>
                 <span id="kpi-high" class="kpi-value" style="color:#ea580c;">-</span>
               </div>
               <div class="kpi-meta">Urgent triage recommendations</div>
             </div>
             <div class="kpi-card">
               <div class="kpi-title">Avg NLP Duration</div>
-              <div id="kpi-speed" class="kpi-value">-</div>
-              <div class="kpi-meta">End-to-end inference speed</div>
+              <div id="kpi-speed" class="kpi-value" style="color:#2563eb;">-</div>
+              <div class="kpi-meta">End-to-end pipeline latency</div>
             </div>
           </div>
 
@@ -138,7 +138,7 @@
 
             <div class="chart-card">
               <div class="chart-header">
-                <h3 class="chart-title">Priority Breakdown (Rule-Based)</h3>
+                <h3 class="chart-title">Priority Breakdown (Explainable Rules)</h3>
               </div>
               <div class="chart-container">
                 <canvas id="priorityChart"></canvas>
@@ -149,7 +149,7 @@
           <!-- Priority Queue Table -->
           <div class="table-card">
             <div class="table-toolbar">
-              <h3 style="font-size:0.95rem; font-weight:600;">Active Priority Triage Queue</h3>
+              <h3 style="font-size:1rem; font-weight:700;">Immediate Priority Triage Queue</h3>
               <button class="btn btn-secondary btn-sm" onclick="switchView('tickets')">View All Tickets &rarr;</button>
             </div>
             <div style="overflow-x:auto;">
@@ -157,14 +157,14 @@
                 <thead>
                   <tr>
                     <th>Ticket Code</th>
-                    <th>Subject</th>
+                    <th>Subject & Customer</th>
                     <th>Priority</th>
                     <th>Status</th>
                     <th>Action</th>
                   </tr>
                 </thead>
                 <tbody id="priority-queue-table-body">
-                  <tr><td colspan="5" class="text-center py-3 text-muted">Loading queue...</td></tr>
+                  <tr><td colspan="5" class="text-center py-4 text-muted">Loading queue...</td></tr>
                 </tbody>
               </table>
             </div>
@@ -173,6 +173,17 @@
 
         <!-- 2. ALL TICKETS VIEW -->
         <div id="view-tickets" class="view-section">
+          <!-- Quick Filter Pills -->
+          <div class="filter-pills">
+            <span style="font-size:0.8rem; font-weight:700; color:#64748b; margin-right:4px;">QUICK CUTS:</span>
+            <button class="filter-pill active" onclick="setQuickFilter('all', '')">All Tickets</button>
+            <button class="filter-pill" onclick="setQuickFilter('priority', 'CRITICAL')">🚨 Critical Only</button>
+            <button class="filter-pill" onclick="setQuickFilter('priority', 'HIGH')">⚠️ High Priority</button>
+            <button class="filter-pill" onclick="setQuickFilter('status', 'NEEDS_REVIEW')">⏳ Needs Review</button>
+            <button class="filter-pill" onclick="setQuickFilter('status', 'APPROVED')">✓ Approved</button>
+            <button class="filter-pill" onclick="setQuickFilter('status', 'RESOLVED')">🏁 Resolved</button>
+          </div>
+
           <div class="table-card">
             <div class="table-toolbar">
               <div class="table-search">
@@ -182,6 +193,7 @@
                   <option value="NEW">NEW</option>
                   <option value="ANALYZING">ANALYZING</option>
                   <option value="NEEDS_REVIEW">NEEDS_REVIEW</option>
+                  <option value="IN_PROGRESS">IN_PROGRESS</option>
                   <option value="APPROVED">APPROVED</option>
                   <option value="REJECTED">REJECTED</option>
                   <option value="RESOLVED">RESOLVED</option>
@@ -194,7 +206,8 @@
                   <option value="LOW">LOW</option>
                 </select>
               </div>
-              <div>
+              <div style="display:flex; align-items:center; gap:0.6rem;">
+                <span id="tickets-count-badge" style="font-size:0.8rem; font-weight:700; color:#64748b;">-</span>
                 <button class="btn btn-primary btn-sm" onclick="openCreateTicketModal()">+ Create Ticket</button>
               </div>
             </div>
@@ -228,9 +241,9 @@
 
         <!-- 4. ANALYTICS VIEW -->
         <div id="view-analytics" class="view-section">
-          <div style="margin-bottom:1.25rem;">
-            <h2 style="font-size:1.25rem; font-weight:700;">Operational Analytics & Inference Reports</h2>
-            <p style="font-size:0.875rem; color:#64748b;">Comprehensive distribution of customer requests and triage signals.</p>
+          <div style="margin-bottom:1.4rem;">
+            <h2 style="font-size:1.25rem; font-weight:800; color:#0f172a;">Operational Analytics & Triage Reports</h2>
+            <p style="font-size:0.875rem; color:#64748b;">Aggregated metrics and distributions calculated directly from SQLite records.</p>
           </div>
           <div class="charts-grid">
             <div class="chart-card">
@@ -240,9 +253,23 @@
               </div>
             </div>
             <div class="chart-card">
-              <h3 class="chart-title">Triage Urgency Recommendations</h3>
+              <h3 class="chart-title">Priority Recommendations (Rule-Engine)</h3>
               <div class="chart-container">
                 <canvas id="analyticsPriorityChart"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="charts-grid">
+            <div class="chart-card">
+              <h3 class="chart-title">Top Intent Classifications (BANKING77)</h3>
+              <div class="chart-container">
+                <canvas id="analyticsIntentChart"></canvas>
+              </div>
+            </div>
+            <div class="chart-card">
+              <h3 class="chart-title">Customer Sentiment Breakdown (SST-2 Polarity)</h3>
+              <div class="chart-container">
+                <canvas id="analyticsSentimentChart"></canvas>
               </div>
             </div>
           </div>
@@ -258,6 +285,9 @@
     </main>
   </div>
 
+  <!-- FLOATING TOAST CONTAINER -->
+  <div id="toast-container"></div>
+
   <!-- CREATE TICKET MODAL -->
   <div id="create-ticket-modal" class="modal-overlay">
     <div class="modal-box">
@@ -267,12 +297,23 @@
       </div>
       <form onsubmit="handleCreateTicketSubmit(event)">
         <div class="modal-body">
-          <div class="form-group">
+          <!-- Quick Presets -->
+          <div style="margin-bottom:1rem;">
+            <span style="font-size:0.75rem; font-weight:700; color:#64748b;">QUICK FILL TEMPLATES:</span>
+            <div class="template-pills">
+              <button type="button" class="template-pill" onclick="prefillCreateForm('stolen')">⚡ Card Stolen in Paris (Critical)</button>
+              <button type="button" class="template-pill" onclick="prefillCreateForm('double')">⚡ Double Wire Charge (High)</button>
+              <button type="button" class="template-pill" onclick="prefillCreateForm('phishing')">⚡ Phishing OTP SMS (Critical)</button>
+              <button type="button" class="template-pill" onclick="prefillCreateForm('phone')">⚡ Update 2FA Phone (Low)</button>
+            </div>
+          </div>
+
+          <div class="form-group mb-3">
             <label class="form-label" for="subject">Subject *</label>
             <input type="text" id="subject" name="subject" class="input-field w-100" placeholder="e.g. Card payment not recognised for $149.99" required maxlength="200">
           </div>
 
-          <div class="row">
+          <div class="row mb-3">
             <div class="col-md-6 form-group">
               <label class="form-label" for="customerName">Customer Name</label>
               <input type="text" id="customerName" name="customerName" class="input-field w-100" placeholder="e.g. Jane Doe" maxlength="100">
@@ -283,17 +324,17 @@
             </div>
           </div>
 
-          <div class="form-group">
+          <div class="form-group mb-3">
             <label class="form-label" for="description">Ticket Message / Description *</label>
             <textarea id="description" name="description" class="textarea-field w-100" style="min-height:120px;" placeholder="Full text of the customer inquiry or complaint..." required maxlength="10000"></textarea>
           </div>
 
-          <div class="form-group">
-            <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.875rem; cursor:pointer;">
+          <div class="form-group" style="background:#f8fafc; padding:0.75rem; border-radius:8px; border:1px solid #e2e8f0;">
+            <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.875rem; cursor:pointer; margin-bottom:0;">
               <input type="checkbox" name="autoAnalyze" id="autoAnalyze" checked>
               <strong>Immediately trigger NLP Analysis & AI Draft Generation</strong>
             </label>
-            <div class="form-help">Runs text cleaning, BERT intent classifier, sentiment model, priority rules, T5 summary, and drafts response.</div>
+            <div class="form-help" style="margin-top:2px;">Runs text cleaning, BERT intent classifier, sentiment model, priority rules, T5 summary, and drafts response.</div>
           </div>
         </div>
         <div class="modal-footer">
@@ -306,7 +347,7 @@
 
   <!-- TICKET DETAIL & AI ANALYSIS MODAL -->
   <div id="ticket-detail-modal" class="modal-overlay">
-    <div class="modal-box" style="max-width:900px;">
+    <div class="modal-box" style="max-width:920px;">
       <div class="modal-header">
         <h2>Ticket Detail & AI Triage Analysis</h2>
         <button class="modal-close" onclick="closeTicketDetailModal()">&times;</button>
@@ -378,6 +419,8 @@
   <script src="js/evaluation.js"></script>
 
   <script>
+    let analyticsCharts = {};
+
     function switchView(viewName) {
       document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -425,38 +468,86 @@
         const distRes = await window.api.getDistributions();
         const dists = distRes.data;
 
+        // Destroy previous charts if existing
+        Object.values(analyticsCharts).forEach(c => c && c.destroy && c.destroy());
+        analyticsCharts = {};
+
         const ctx1 = document.getElementById('analyticsStatusChart');
         if (ctx1) {
-          new Chart(ctx1, {
+          analyticsCharts.status = new Chart(ctx1, {
             type: 'pie',
             data: {
               labels: dists.status.map(d => d.label),
               datasets: [{
                 data: dists.status.map(d => d.count),
-                backgroundColor: ['#d97706', '#16a34a', '#475569', '#0d9488', '#dc2626', '#7c3aed']
+                backgroundColor: ['#d97706', '#16a34a', '#0d9488', '#2563eb', '#475569', '#dc2626']
               }]
             },
-            options: { responsive: true, maintainAspectRatio: false }
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
           });
         }
 
         const ctx2 = document.getElementById('analyticsPriorityChart');
         if (ctx2) {
-          new Chart(ctx2, {
+          analyticsCharts.priority = new Chart(ctx2, {
             type: 'bar',
             data: {
               labels: dists.priority.map(d => d.label),
               datasets: [{
                 label: 'Tickets',
                 data: dists.priority.map(d => d.count),
-                backgroundColor: ['#dc2626', '#ea580c', '#2563eb', '#64748b']
+                backgroundColor: dists.priority.map(p => {
+                  if (p.label === 'CRITICAL') return '#dc2626';
+                  if (p.label === 'HIGH') return '#ea580c';
+                  if (p.label === 'MEDIUM') return '#2563eb';
+                  return '#64748b';
+                }),
+                borderRadius: 6,
               }]
             },
-            options: { responsive: true, maintainAspectRatio: false }
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+          });
+        }
+
+        const ctx3 = document.getElementById('analyticsIntentChart');
+        if (ctx3 && dists.intent) {
+          analyticsCharts.intent = new Chart(ctx3, {
+            type: 'bar',
+            data: {
+              labels: dists.intent.slice(0, 7).map(d => d.label),
+              datasets: [{
+                label: 'Frequency',
+                data: dists.intent.slice(0, 7).map(d => d.count),
+                backgroundColor: '#3b82f6',
+                borderRadius: 4,
+              }]
+            },
+            options: {
+              indexAxis: 'y',
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+              scales: { x: { beginAtZero: true, ticks: { precision: 0 } } }
+            }
+          });
+        }
+
+        const ctx4 = document.getElementById('analyticsSentimentChart');
+        if (ctx4 && dists.sentiment) {
+          analyticsCharts.sentiment = new Chart(ctx4, {
+            type: 'doughnut',
+            data: {
+              labels: dists.sentiment.map(d => d.label),
+              datasets: [{
+                data: dists.sentiment.map(d => d.count),
+                backgroundColor: ['#dc2626', '#16a34a', '#64748b']
+              }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
           });
         }
       } catch (e) {
-        console.error(e);
+        console.error('Analytics error:', e);
       }
     }
 

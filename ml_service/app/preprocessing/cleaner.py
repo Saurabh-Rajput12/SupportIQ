@@ -35,3 +35,4 @@ class TextCleaner:
             cleaned = cleaned[:max_length].rstrip()
 
         return cleaned
+

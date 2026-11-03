@@ -30,3 +30,4 @@ def test_cleaner_max_length_truncation():
     raw = "A" * 15000
     cleaned = TextCleaner.clean(raw, max_length=100)
     assert len(cleaned) == 100
+

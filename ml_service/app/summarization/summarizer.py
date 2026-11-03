@@ -66,3 +66,4 @@ class T5Summarizer:
             "model_id": self.model_id,
             "token_count": len(output[0]),
         }
+

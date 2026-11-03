@@ -84,3 +84,4 @@ class AnalysisRepository {
 }
 
 module.exports = new AnalysisRepository();
+
