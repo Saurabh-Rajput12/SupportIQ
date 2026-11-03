@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SupportIQ — Intelligent Support Ticket Triage Engine</title>
+  <!-- Optional Bootstrap 5 CSS for grid/layout utility -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <!-- Custom Design System -->
+  <link rel="stylesheet" href="css/styles.css">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">S</div>
+        <div>
+          <h1>SupportIQ</h1>
+          <span class="brand-badge">Agentic MCA NLP</span>
+        </div>
+      </div>
+
+      <ul class="nav-links">
+        <li class="nav-item active" data-view="dashboard">
+          <button onclick="switchView('dashboard')">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3h7v9H3V3zm11 0h7v5h-7V3zm0 9h7v9h-7v-9zM3 16h7v5H3v-5z"/></svg>
+            Overview
+          </button>
+        </li>
+        <li class="nav-item" data-view="tickets">
+          <button onclick="switchView('tickets')">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+            All Tickets
+          </button>
+        </li>
+        <li class="nav-item">
+          <button onclick="openCreateTicketModal()">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
+            Create Ticket
+          </button>
+        </li>
+        <li class="nav-item" data-view="review">
+          <button onclick="switchView('review')">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+            AI Reply Review
+          </button>
+        </li>
+        <li class="nav-item" data-view="analytics">
+          <button onclick="switchView('analytics')">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+            Analytics & Reports
+          </button>
+        </li>
+        <li class="nav-item" data-view="evaluation">
+          <button onclick="switchView('evaluation')">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Model Evaluation
+          </button>
+        </li>
+      </ul>
+
+      <div class="nav-footer">
+        <div class="agent-profile">
+          <div class="agent-avatar">AG</div>
+          <div>
+            <div style="font-weight:600; color:#f8fafc;">agent@supportiq.local</div>
+            <div style="font-size:0.7rem; color:#94a3b8;">Human-in-the-Loop Agent</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Application Wrapper -->
+    <main class="main-wrapper">
+      <!-- Topbar Header -->
+      <header class="topbar">
+        <h2 id="current-view-title" class="page-title">Operations Dashboard</h2>
+        <div class="topbar-actions">
+          <div id="model-readiness-badge" class="status-indicator">
+            <span class="dot"></span> Checking ML Service...
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="openCreateTicketModal()">
+            + New Ticket
+          </button>
+        </div>
+      </header>
+
+      <!-- Dynamic View Container -->
+      <section class="content-area">
+        <!-- 1. DASHBOARD VIEW -->
+        <div id="view-dashboard" class="view-section active">
+          <!-- KPI Summary Cards -->
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-title">Total Ingested</div>
+              <div id="kpi-total" class="kpi-value">-</div>
+              <div class="kpi-meta">All-time tickets recorded</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-title">Open Queue</div>
+              <div id="kpi-open" class="kpi-value">-</div>
+              <div class="kpi-meta">Active operational tickets</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-title">Needs Review</div>
+              <div id="kpi-review" class="kpi-value">-</div>
+              <div class="kpi-meta">Drafts awaiting human agent</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-title">Critical & High</div>
+              <div style="display:flex; gap:0.5rem; align-items:baseline;">
+                <span id="kpi-critical" class="kpi-value text-danger">-</span>
+                <span style="color:#94a3b8;">/</span>
+                <span id="kpi-high" class="kpi-value" style="color:#ea580c;">-</span>
+              </div>
+              <div class="kpi-meta">Urgent triage recommendations</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-title">Avg NLP Duration</div>
+              <div id="kpi-speed" class="kpi-value">-</div>
+              <div class="kpi-meta">End-to-end inference speed</div>
+            </div>
+          </div>
+
+          <!-- Charts Grid -->
+          <div class="charts-grid">
+            <div class="chart-card">
+              <div class="chart-header">
+                <h3 class="chart-title">Ticket Status Distribution</h3>
+              </div>
+              <div class="chart-container">
+                <canvas id="statusChart"></canvas>
+              </div>
+            </div>
+
+            <div class="chart-card">
+              <div class="chart-header">
+                <h3 class="chart-title">Priority Breakdown (Rule-Based)</h3>
+              </div>
+              <div class="chart-container">
+                <canvas id="priorityChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Priority Queue Table -->
+          <div class="table-card">
+            <div class="table-toolbar">
+              <h3 style="font-size:0.95rem; font-weight:600;">Active Priority Triage Queue</h3>
+              <button class="btn btn-secondary btn-sm" onclick="switchView('tickets')">View All Tickets &rarr;</button>
+            </div>
+            <div style="overflow-x:auto;">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>Ticket Code</th>
+                    <th>Subject</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="priority-queue-table-body">
+                  <tr><td colspan="5" class="text-center py-3 text-muted">Loading queue...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. ALL TICKETS VIEW -->
+        <div id="view-tickets" class="view-section">
+          <div class="table-card">
+            <div class="table-toolbar">
+              <div class="table-search">
+                <input type="text" id="ticket-search-input" class="input-field" placeholder="Search code, subject, customer..." oninput="handleSearchInput(this.value)">
+                <select id="filter-status-select" class="select-field" onchange="handleStatusFilter(this.value)">
+                  <option value="">All Statuses</option>
+                  <option value="NEW">NEW</option>
+                  <option value="ANALYZING">ANALYZING</option>
+                  <option value="NEEDS_REVIEW">NEEDS_REVIEW</option>
+                  <option value="APPROVED">APPROVED</option>
+                  <option value="REJECTED">REJECTED</option>
+                  <option value="RESOLVED">RESOLVED</option>
+                </select>
+                <select id="filter-priority-select" class="select-field" onchange="handlePriorityFilter(this.value)">
+                  <option value="">All Priorities</option>
+                  <option value="CRITICAL">CRITICAL</option>
+                  <option value="HIGH">HIGH</option>
+                  <option value="MEDIUM">MEDIUM</option>
+                  <option value="LOW">LOW</option>
+                </select>
+              </div>
+              <div>
+                <button class="btn btn-primary btn-sm" onclick="openCreateTicketModal()">+ Create Ticket</button>
+              </div>
+            </div>
+
+            <div style="overflow-x:auto;">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>Code</th>
+                    <th>Subject & Customer</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th>Predicted Intent</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="tickets-table-body">
+                  <tr><td colspan="6" class="text-center py-4 text-muted">Loading tickets...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. AI REPLY REVIEW VIEW -->
+        <div id="view-review" class="view-section">
+          <div id="review-content-area">
+            <!-- Populated dynamically by review.js -->
+          </div>
+        </div>
+
+        <!-- 4. ANALYTICS VIEW -->
+        <div id="view-analytics" class="view-section">
+          <div style="margin-bottom:1.25rem;">
+            <h2 style="font-size:1.25rem; font-weight:700;">Operational Analytics & Inference Reports</h2>
+            <p style="font-size:0.875rem; color:#64748b;">Comprehensive distribution of customer requests and triage signals.</p>
+          </div>
+          <div class="charts-grid">
+            <div class="chart-card">
+              <h3 class="chart-title">Status Lifecycle Distribution</h3>
+              <div class="chart-container">
+                <canvas id="analyticsStatusChart"></canvas>
+              </div>
+            </div>
+            <div class="chart-card">
+              <h3 class="chart-title">Triage Urgency Recommendations</h3>
+              <div class="chart-container">
+                <canvas id="analyticsPriorityChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. MODEL EVALUATION VIEW -->
+        <div id="view-evaluation" class="view-section">
+          <div id="evaluation-content-area">
+            <!-- Populated dynamically by evaluation.js -->
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- CREATE TICKET MODAL -->
+  <div id="create-ticket-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2>Create New Customer Support Ticket</h2>
+        <button class="modal-close" onclick="closeCreateTicketModal()">&times;</button>
+      </div>
+      <form onsubmit="handleCreateTicketSubmit(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="subject">Subject *</label>
+            <input type="text" id="subject" name="subject" class="input-field w-100" placeholder="e.g. Card payment not recognised for $149.99" required maxlength="200">
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 form-group">
+              <label class="form-label" for="customerName">Customer Name</label>
+              <input type="text" id="customerName" name="customerName" class="input-field w-100" placeholder="e.g. Jane Doe" maxlength="100">
+            </div>
+            <div class="col-md-6 form-group">
+              <label class="form-label" for="customerReference">Customer Reference ID</label>
+              <input type="text" id="customerReference" name="customerReference" class="input-field w-100" placeholder="e.g. CUST-5510" maxlength="50">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="description">Ticket Message / Description *</label>
+            <textarea id="description" name="description" class="textarea-field w-100" style="min-height:120px;" placeholder="Full text of the customer inquiry or complaint..." required maxlength="10000"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.875rem; cursor:pointer;">
+              <input type="checkbox" name="autoAnalyze" id="autoAnalyze" checked>
+              <strong>Immediately trigger NLP Analysis & AI Draft Generation</strong>
+            </label>
+            <div class="form-help">Runs text cleaning, BERT intent classifier, sentiment model, priority rules, T5 summary, and drafts response.</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeCreateTicketModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create Ticket</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TICKET DETAIL & AI ANALYSIS MODAL -->
+  <div id="ticket-detail-modal" class="modal-overlay">
+    <div class="modal-box" style="max-width:900px;">
+      <div class="modal-header">
+        <h2>Ticket Detail & AI Triage Analysis</h2>
+        <button class="modal-close" onclick="closeTicketDetailModal()">&times;</button>
+      </div>
+      <div id="ticket-detail-content" class="modal-body">
+        <!-- Injected via tickets.js -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeTicketDetailModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- REJECT REPLY MODAL -->
+  <div id="reject-reply-modal" class="modal-overlay">
+    <div class="modal-box" style="max-width:500px;">
+      <div class="modal-header">
+        <h2>Reject Reply Draft</h2>
+        <button class="modal-close" onclick="closeRejectModal()">&times;</button>
+      </div>
+      <form onsubmit="handleRejectSubmit(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="rejectReason">Rejection Reason *</label>
+            <textarea id="rejectReason" name="rejectReason" class="textarea-field w-100" style="min-height:90px;" placeholder="e.g. Tone too casual; unverified promise about refund timing..." required minlength="3"></textarea>
+            <div class="form-help">Mandatory reason will be recorded in the audit history.</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeRejectModal()">Cancel</button>
+          <button type="submit" class="btn btn-danger">Confirm Rejection</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- REGENERATE DRAFT MODAL -->
+  <div id="regenerate-modal" class="modal-overlay">
+    <div class="modal-box" style="max-width:500px;">
+      <div class="modal-header">
+        <h2>Regenerate Reply Draft</h2>
+        <button class="modal-close" onclick="closeRegenerateModal()">&times;</button>
+      </div>
+      <form onsubmit="handleRegenerateSubmit(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="promptStrategy">Select Prompt Engineering Strategy</label>
+            <select id="promptStrategy" name="promptStrategy" class="select-field w-100">
+              <option value="FEW_SHOT" selected>FEW_SHOT (3 Exemplar Customer Support Pairs)</option>
+              <option value="ZERO_SHOT">ZERO_SHOT (Direct Task Instruction + Context)</option>
+              <option value="STRUCTURED">STRUCTURED (Explicit Sections & Bounded Output)</option>
+            </select>
+            <div class="form-help">Creates a new version in the database, superseding prior drafts.</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeRegenerateModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Generate Draft</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/tickets.js"></script>
+  <script src="js/review.js"></script>
+  <script src="js/evaluation.js"></script>
+
+  <script>
+    function switchView(viewName) {
+      document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+      const targetView = document.getElementById(`view-${viewName}`);
+      const targetNav = document.querySelector(`.nav-item[data-view="${viewName}"]`);
+
+      if (targetView) targetView.classList.add('active');
+      if (targetNav) targetNav.classList.add('active');
+
+      const titleEl = document.getElementById('current-view-title');
+      const titles = {
+        dashboard: 'Operations Dashboard',
+        tickets: 'All Customer Tickets',
+        review: 'AI Reply Review & Approval Workspace',
+        analytics: 'Analytics & Inference Reports',
+        evaluation: 'Model Evaluation & Academic Benchmark'
+      };
+      if (titleEl) titleEl.textContent = titles[viewName] || 'Dashboard';
+
+      if (viewName === 'dashboard') loadDashboard();
+      if (viewName === 'tickets') loadTicketsList();
+      if (viewName === 'review') loadReviewWorkspace();
+      if (viewName === 'analytics') loadAnalyticsView();
+      if (viewName === 'evaluation') loadEvaluationView();
+    }
+
+    function handleSearchInput(val) {
+      currentSearch = val.trim();
+      loadTicketsList();
+    }
+
+    function handleStatusFilter(val) {
+      currentFilterStatus = val;
+      loadTicketsList();
+    }
+
+    function handlePriorityFilter(val) {
+      currentFilterPriority = val;
+      loadTicketsList();
+    }
+
+    async function loadAnalyticsView() {
+      try {
+        const distRes = await window.api.getDistributions();
+        const dists = distRes.data;
+
+        const ctx1 = document.getElementById('analyticsStatusChart');
+        if (ctx1) {
+          new Chart(ctx1, {
+            type: 'pie',
+            data: {
+              labels: dists.status.map(d => d.label),
+              datasets: [{
+                data: dists.status.map(d => d.count),
+                backgroundColor: ['#d97706', '#16a34a', '#475569', '#0d9488', '#dc2626', '#7c3aed']
+              }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+          });
+        }
+
+        const ctx2 = document.getElementById('analyticsPriorityChart');
+        if (ctx2) {
+          new Chart(ctx2, {
+            type: 'bar',
+            data: {
+              labels: dists.priority.map(d => d.label),
+              datasets: [{
+                label: 'Tickets',
+                data: dists.priority.map(d => d.count),
+                backgroundColor: ['#dc2626', '#ea580c', '#2563eb', '#64748b']
+              }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+          });
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // Initialize on document ready
+    document.addEventListener('DOMContentLoaded', () => {
+      switchView('dashboard');
+    });
+  </script>
+</body>
+</html>

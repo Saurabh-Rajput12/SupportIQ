@@ -1,0 +1,105 @@
+import os
+import json
+import torch
+from typing import Dict, Any, List
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+
+DEFAULT_MODEL_DIR = "models/intent_classifier"
+FALLBACK_BASE_MODEL = "google-bert/bert-base-uncased"
+
+class IntentClassifier:
+    """
+    BERT Intent Classifier for SupportIQ (Syllabus Experiment 2).
+    Evaluates customer support ticket text and outputs intent prediction,
+    softmax confidence score, and top-k candidates.
+    """
+    def __init__(self, model_dir: str = DEFAULT_MODEL_DIR):
+        self.model_dir = model_dir
+        self.device = "mps" if torch.backends.mps.is_available() else ("cuda" if torch.cuda.is_available() else "cpu")
+        self.model = None
+        self.tokenizer = None
+        self.id2label = {}
+        self.label2id = {}
+        self._is_loaded = False
+
+    def load(self):
+        if self._is_loaded:
+            return
+
+        if os.path.exists(os.path.join(self.model_dir, "config.json")):
+            path = self.model_dir
+            print(f"[IntentClassifier] Loading trained BERT checkpoint from {path}...")
+        else:
+            path = FALLBACK_BASE_MODEL
+            print(f"[IntentClassifier] Trained checkpoint not found at {self.model_dir}, loading baseline {path}...")
+
+        self.tokenizer = AutoTokenizer.from_pretrained(path)
+
+        # Load label mapping if present
+        label_file = os.path.join(self.model_dir, "id2label.json")
+        if not os.path.exists(label_file):
+            label_file = "data/processed/banking77_id2label.json"
+
+        if os.path.exists(label_file):
+            with open(label_file, "r") as f:
+                raw_map = json.load(f)
+                self.id2label = {int(k): v for k, v in raw_map.items()}
+                self.label2id = {v: int(k) for k, v in self.id2label.items()}
+
+        num_labels = len(self.id2label) if self.id2label else 77
+
+        try:
+            self.model = AutoModelForSequenceClassification.from_pretrained(
+                path,
+                num_labels=num_labels,
+                id2label=self.id2label if self.id2label else None,
+                label2id=self.label2id if self.label2id else None,
+            )
+        except Exception as e:
+            print(f"[IntentClassifier] Notice: loading without strict weights: {e}")
+            self.model = AutoModelForSequenceClassification.from_pretrained(
+                FALLBACK_BASE_MODEL,
+                num_labels=num_labels,
+                id2label=self.id2label if self.id2label else None,
+                label2id=self.label2id if self.label2id else None,
+            )
+
+        self.model.to(self.device)
+        self.model.eval()
+        self._is_loaded = True
+        print(f"[IntentClassifier] Loaded on {self.device} with {num_labels} intent labels.")
+
+    def predict(self, text: str, top_k_count: int = 3) -> Dict[str, Any]:
+        if not self._is_loaded:
+            self.load()
+
+        inputs = self.tokenizer(
+            text,
+            return_tensors="pt",
+            truncation=True,
+            padding=True,
+            max_length=128
+        )
+        inputs = {k: v.to(self.device) for k, v in inputs.items()}
+
+        with torch.no_grad():
+            logits = self.model(**inputs).logits
+            probs = torch.softmax(logits, dim=-1)[0]
+
+        top_indices = torch.argsort(probs, descending=True)[:top_k_count]
+        top_k = []
+        for idx in top_indices:
+            i = int(idx)
+            lbl = self.id2label.get(i, f"intent_{i}")
+            conf = float(probs[i])
+            top_k.append({"label": lbl, "confidence": round(conf, 4)})
+
+        top_pred = top_k[0]
+
+        return {
+            "label": top_pred["label"],
+            "confidence": top_pred["confidence"],
+            "top_k": top_k,
+            "model_id": "supportiq-bert-banking77-v1",
+            "is_confident": bool(top_pred["confidence"] >= 0.5),
+        }
