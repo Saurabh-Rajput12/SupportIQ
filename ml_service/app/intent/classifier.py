@@ -14,7 +14,7 @@ class IntentClassifier:
     softmax confidence score, and top-k candidates.
     """
     def __init__(self, model_dir: str = "models/intent_classifier"):
-        self.project_root = Path(__file__).resolve().parents[2]  # SupportIQ root
+        self.project_root = Path(__file__).resolve().parents[3]  # SupportIQ root
         self.model_dir = str(self.project_root / "models" / "intent_classifier")
         self.device = "mps" if torch.backends.mps.is_available() else ("cuda" if torch.cuda.is_available() else "cpu")
         self.model = None
