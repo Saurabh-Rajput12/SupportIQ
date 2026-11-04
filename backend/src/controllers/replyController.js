@@ -46,7 +46,7 @@ class ReplyController {
   async regenerateReply(req, res, next) {
     try {
       const ticketId = parseInt(req.params.id, 10);
-      const { promptType = 'FEW_SHOT' } = req.body;
+      const { promptType = 'INSTRUCTIONAL' } = req.body;
       const result = await reviewService.regenerateReply(ticketId, req.user.id, promptType);
       res.json({
         success: true,

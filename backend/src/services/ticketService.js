@@ -2,6 +2,8 @@ const ticketRepo = require('../repositories/ticketRepository');
 const analysisRepo = require('../repositories/analysisRepository');
 const replyRepo = require('../repositories/replyRepository');
 const historyRepo = require('../repositories/historyRepository');
+const sourceRepo = require('../repositories/sourceRepository');
+const qualityRepo = require('../repositories/qualityRepository');
 const mlClient = require('./mlClient');
 const { getDb } = require('../db/connection');
 
@@ -48,11 +50,23 @@ class TicketService {
     const history = historyRepo.getHistoryForTicket(id);
     const allReplies = replyRepo.getAllForTicket(id);
 
+    // Enrich replies with sources and quality scores
+    if (latestReply) {
+      latestReply.sources = sourceRepo.getByReplyId(latestReply.id);
+      latestReply.quality = qualityRepo.getByReplyId(latestReply.id);
+    }
+
+    const enrichedReplies = allReplies.map(r => ({
+      ...r,
+      sources: sourceRepo.getByReplyId(r.id),
+      quality: qualityRepo.getByReplyId(r.id),
+    }));
+
     return {
       ...ticket,
       analysis: latestAnalysis,
       currentReply: latestReply,
-      replyVersions: allReplies,
+      replyVersions: enrichedReplies,
       history,
     };
   }
@@ -83,7 +97,7 @@ class TicketService {
     return ticketRepo.findById(id);
   }
 
-  async analyzeTicket(id, actorId, promptType = 'FEW_SHOT') {
+  async analyzeTicket(id, actorId, promptType = 'INSTRUCTIONAL') {
     const ticket = ticketRepo.findById(id);
     if (!ticket) {
       throw new Error(`Ticket #${id} not found.`);
@@ -120,6 +134,19 @@ class TicketService {
         // Persist reply draft
         if (analysisResult.reply) {
           replyRow = replyRepo.createReply(id, analysisRow.id, analysisResult.reply);
+
+          // Persist retrieved RAG sources
+          if (analysisResult.sources && analysisResult.sources.length > 0) {
+            sourceRepo.createMany(replyRow.id, analysisResult.sources);
+          }
+
+          // Persist quality audit & duplicate indicators
+          qualityRepo.create(
+            replyRow.id,
+            analysisResult.quality || {},
+            analysisResult.similar_tickets || [],
+            analysisResult.is_duplicate || false
+          );
         }
 
         // Transition ticket status to NEEDS_REVIEW
@@ -136,6 +163,9 @@ class TicketService {
             sentiment: analysisResult.sentiment?.label,
             priority: analysisResult.priority?.label,
             processing_ms: analysisResult.processing_ms,
+            sources_count: analysisResult.sources?.length || 0,
+            groundedness: analysisResult.quality?.groundedness?.score,
+            is_duplicate: analysisResult.is_duplicate || false,
             warnings: analysisResult.warnings || [],
           },
         });
@@ -143,10 +173,11 @@ class TicketService {
 
       tx();
 
+      const detail = await this.getTicketDetail(id);
       return {
-        ticket: ticketRepo.findById(id),
+        ticket: detail,
         analysis: analysisRow,
-        reply: replyRow,
+        reply: detail.currentReply,
       };
     } catch (err) {
       // Set to FAILED on analysis error so it can be inspected/retried
@@ -165,4 +196,3 @@ class TicketService {
 }
 
 module.exports = new TicketService();
-

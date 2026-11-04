@@ -145,13 +145,36 @@ async function openTicketDetail(ticketId) {
 
     let replyHtml = '';
     if (reply) {
+      const q = reply.quality || {};
+      const sources = reply.sources || [];
+      const groundedBadge = q.groundedness !== undefined && q.groundedness !== null
+        ? `<span class="badge" style="background:#dcfce7; color:#15803d; font-size:0.75rem;">🛡️ Grounded: ${Math.round(q.groundedness * 100)}%</span>`
+        : '';
+      const dupBadge = q.is_duplicate ? '<span class="badge" style="background:#fee2e2; color:#b91c1c; font-size:0.75rem;">🚨 Possible Duplicate</span>' : '';
+
       replyHtml = `
         <div style="margin-top:1.25rem; border-top:1px solid #e2e8f0; padding-top:1rem;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-            <h4 style="font-size:0.95rem; font-weight:700;">Latest Draft (v${reply.version})</h4>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem; flex-wrap:wrap; gap:0.4rem;">
+            <div style="display:flex; align-items:center; gap:0.4rem;">
+              <h4 style="font-size:0.95rem; font-weight:700; margin:0;">Latest Draft (v${reply.version})</h4>
+              ${groundedBadge}
+              ${dupBadge}
+            </div>
             <span class="badge badge-status-${escapeHtml(reply.status)}">${escapeHtml(reply.status)}</span>
           </div>
           <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:0.85rem; font-size:0.875rem; white-space:pre-wrap; margin-bottom:0.75rem;">${escapeHtml(reply.current_text)}</div>
+
+          ${sources.length > 0 ? `
+            <div style="font-size:0.78rem; background:#ffffff; border:1px solid #e2e8f0; border-radius:6px; padding:0.6rem; margin-bottom:0.75rem;">
+              <strong style="color:#1e293b;">Retrieved Sources (${sources.length}):</strong>
+              <div style="display:flex; flex-direction:column; gap:3px; margin-top:4px;">
+                ${sources.map(s => `
+                  <div style="color:#475569;">• [${escapeHtml(s.doc_type)}] ${escapeHtml(s.title || s.doc_id)} ${s.score ? `<span style="color:#2563eb;">(${(s.score*100).toFixed(0)}%)</span>` : ''}</div>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+
           <div style="display:flex; gap:0.5rem; justify-content:flex-end;">
             <button class="btn btn-secondary btn-sm" onclick="copyTextToClipboard('${escapeHtml(reply.current_text).replace(/'/g, "\\'")}', 'Draft copied to clipboard!')">Copy Draft</button>
             <button class="btn btn-primary btn-sm" onclick="switchToReviewTab(${t.id})">Open Review Workspace &rarr;</button>

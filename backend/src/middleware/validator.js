@@ -53,6 +53,18 @@ const editReplySchema = z.object({
   text: z.string().trim().min(1, 'Reply text cannot be empty').max(10000),
 });
 
+const regenerateReplySchema = z.object({
+  promptType: z.enum([
+    'ZERO_SHOT',
+    'FEW_SHOT',
+    'STRUCTURED',
+    'INSTRUCTIONAL',
+    'CONVERSATIONAL',
+    'COT',
+    'SELF_CONSISTENCY'
+  ]).default('INSTRUCTIONAL'),
+});
+
 const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(1),
@@ -65,6 +77,7 @@ module.exports = {
   approveReplySchema,
   rejectReplySchema,
   editReplySchema,
+  regenerateReplySchema,
   loginSchema,
 };
 

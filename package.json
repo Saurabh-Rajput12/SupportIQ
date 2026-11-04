@@ -1,0 +1,12 @@
+{
+  "name": "supportiq",
+  "version": "2.0.0",
+  "description": "SupportIQ: RAG-Powered GenAI Support Copilot",
+  "scripts": {
+    "ml": "cd ml_service && .venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000",
+    "backend": "cd backend && node src/server.js",
+    "build:kb": "cd ml_service && .venv/bin/python scripts/build_kb.py",
+    "eval:retrieval": "cd ml_service && .venv/bin/python scripts/eval_retrieval.py",
+    "eval:prompts": "cd ml_service && .venv/bin/python scripts/eval_prompts.py"
+  }
+}

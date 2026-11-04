@@ -72,3 +72,39 @@ This log records non-negotiable architectural decisions, research evaluations, a
   - Pluggable `ReplyProvider` architecture with deterministic, labeled `demo_fallback=true` when external LLM credentials are absent.
   - **Human-in-the-Loop Non-Negotiable Rule:** The system produces **drafts only**. Every reply must be reviewed, edited, approved, or rejected by an authenticated agent. Approval sets `sent=false`. Automatic email/message sending is prohibited.
 
+
+---
+
+## ADR-007: FAISS Flat Index for RAG Vector Search & Semantic Similarity
+- **Date:** 2026-11-04
+- **Status:** Accepted (GenAI Upgrade)
+- **Context:** Syllabus Experiment 5 requires dense vector search and semantic retrieval over official banking policies and past ticket inquiries.
+- **Decision:**
+  - Embeddings: `sentence-transformers/all-MiniLM-L6-v2` (384-dimensional dense vectors, normalized).
+  - Vector Store: `faiss.IndexFlatIP` (exact inner product on unit vectors = exact cosine similarity).
+  - Justification: For corpora under 100,000 documents (~1,745 in SupportIQ), `IndexFlatIP` provides exact retrieval (100% recall) in under 25 ms without the quantization loss or hyperparameter tuning required by IVF or HNSW.
+
+---
+
+## ADR-008: Local Small LLM (Qwen2.5-1.5B-Instruct) & Prompt Engineering Strategies
+- **Date:** 2026-11-04
+- **Status:** Accepted (GenAI Upgrade)
+- **Context:** Syllabus Experiment 4 requires comparing real generative prompting paradigms (Instructional, Conversational, Chain-of-Thought, Self-Consistency, Few-Shot, Zero-Shot, Structured).
+- **Decision:**
+  - Model: Local `Qwen/Qwen2.5-1.5B-Instruct` with PyTorch Apple Silicon MPS acceleration and optional OpenAI-compatible provider abstraction.
+  - Context Injection: Grounded RAG context block inserted into every prompt.
+  - Safety Isolation: Untrusted customer input strictly wrapped in `<<< >>>` delimiters.
+  - Chain-of-Thought: Model reasons privately step-by-step; internal reasoning is parsed out so only text after `FINAL REPLY:` is presented to the agent.
+  - Self-Consistency: Samples 3 candidate replies and picks the central consensus via token overlap.
+
+---
+
+## ADR-009: Automated Groundedness Verification & LLM-as-a-Judge Quality Layer
+- **Date:** 2026-11-04
+- **Status:** Accepted (GenAI Upgrade)
+- **Context:** GenAI responses must be auditable and protected against hallucinations, false promises, and credential requests.
+- **Decision:**
+  - Sentence-level Groundedness Check: Compares each sentence in the draft against retrieved context and ticket text using embedding cosine similarity; flags unsupported claims and numbers not in source.
+  - LLM-as-a-Judge: Automated evaluation scoring relevance, tone, and safety on a 1-5 scale.
+  - Deterministic Safety Guards: Keyword and regex filters catch unauthorized credential requests (PIN, password) and override safety to 1.
+  - Human Oversight: Quality scores and flagged sentences are presented directly in the Agent Review Workspace to guide human editing and approval.

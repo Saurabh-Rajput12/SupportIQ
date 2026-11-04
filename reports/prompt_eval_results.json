@@ -1,0 +1,70 @@
+{
+  "title": "Experiment 4: Comparative Evaluation of Prompt Strategies",
+  "sample_size": 5,
+  "evaluated_at": "2026-11-04T07:35:27Z",
+  "strategies": {
+    "ZERO_SHOT": {
+      "relevance": 4.4,
+      "tone": 4.6,
+      "groundedness": 0.27,
+      "consistency": 0.78,
+      "avg_words": 113.8,
+      "avg_latency_s": 5.9,
+      "model_id": "Qwen/Qwen2.5-1.5B-Instruct"
+    },
+    "FEW_SHOT": {
+      "relevance": 4.0,
+      "tone": 4.8,
+      "groundedness": 0.46,
+      "consistency": 0.85,
+      "avg_words": 85.2,
+      "avg_latency_s": 3.83,
+      "model_id": "Qwen/Qwen2.5-1.5B-Instruct"
+    },
+    "STRUCTURED": {
+      "relevance": 4.2,
+      "tone": 4.4,
+      "groundedness": 0.35,
+      "consistency": 0.89,
+      "avg_words": 82.8,
+      "avg_latency_s": 3.75,
+      "model_id": "Qwen/Qwen2.5-1.5B-Instruct"
+    },
+    "INSTRUCTIONAL": {
+      "relevance": 4.2,
+      "tone": 4.0,
+      "groundedness": 0.36,
+      "consistency": 0.91,
+      "avg_words": 97.0,
+      "avg_latency_s": 4.22,
+      "model_id": "Qwen/Qwen2.5-1.5B-Instruct"
+    },
+    "CONVERSATIONAL": {
+      "relevance": 4.0,
+      "tone": 4.4,
+      "groundedness": 0.29,
+      "consistency": 0.84,
+      "avg_words": 81.2,
+      "avg_latency_s": 3.37,
+      "model_id": "Qwen/Qwen2.5-1.5B-Instruct"
+    },
+    "COT": {
+      "relevance": 4.2,
+      "tone": 4.4,
+      "groundedness": 0.43,
+      "consistency": 0.93,
+      "avg_words": 90.8,
+      "avg_latency_s": 3.75,
+      "model_id": "Qwen/Qwen2.5-1.5B-Instruct"
+    },
+    "SELF_CONSISTENCY": {
+      "relevance": 4.0,
+      "tone": 4.6,
+      "groundedness": 0.29,
+      "consistency": 0.96,
+      "avg_words": 122.2,
+      "avg_latency_s": 12.74,
+      "model_id": "Qwen/Qwen2.5-1.5B-Instruct"
+    }
+  }
+}

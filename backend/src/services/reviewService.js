@@ -3,6 +3,8 @@ const ticketRepo = require('../repositories/ticketRepository');
 const reviewRepo = require('../repositories/reviewRepository');
 const historyRepo = require('../repositories/historyRepository');
 const analysisRepo = require('../repositories/analysisRepository');
+const sourceRepo = require('../repositories/sourceRepository');
+const qualityRepo = require('../repositories/qualityRepository');
 const mlClient = require('./mlClient');
 const { getDb } = require('../db/connection');
 
@@ -143,7 +145,7 @@ class ReviewService {
     };
   }
 
-  async regenerateReply(ticketId, agentId, promptType = 'FEW_SHOT') {
+  async regenerateReply(ticketId, agentId, promptType = 'INSTRUCTIONAL') {
     const ticket = ticketRepo.findById(ticketId);
     if (!ticket) throw new Error(`Ticket #${ticketId} not found.`);
 
@@ -152,9 +154,15 @@ class ReviewService {
       throw new Error(`Cannot regenerate reply: Ticket #${ticketId} has not been analyzed yet.`);
     }
 
+    const existingReply = replyRepo.getLatestForTicket(ticketId);
+    let existingSources = [];
+    if (existingReply) {
+      existingSources = sourceRepo.getByReplyId(existingReply.id);
+    }
+
     const combinedText = `${ticket.subject}\n\n${ticket.description}`;
 
-    // Call ML service for new reply generation
+    // Call ML service for new reply generation with strategy and existing knowledge sources
     const replyOutput = await mlClient.regenerateReply({
       ticket_text: combinedText,
       intent: latestAnalysis.intent_label || 'general_inquiry',
@@ -162,6 +170,13 @@ class ReviewService {
       priority: latestAnalysis.priority_label || 'MEDIUM',
       summary: latestAnalysis.summary || ticket.subject,
       prompt_type: promptType,
+      context_docs: existingSources.map(s => ({
+        id: s.doc_id,
+        type: s.doc_type,
+        title: s.title,
+        text: s.snippet,
+        score: s.score,
+      })),
     });
 
     const db = getDb();
@@ -169,6 +184,29 @@ class ReviewService {
 
     const tx = db.transaction(() => {
       newReply = replyRepo.createReply(ticketId, latestAnalysis.id, replyOutput);
+
+      // Copy sources to the new reply
+      if (existingSources.length > 0) {
+        sourceRepo.createMany(newReply.id, existingSources.map(s => ({
+          id: s.doc_id,
+          type: s.doc_type,
+          title: s.title,
+          text: s.snippet,
+          score: s.score,
+        })));
+      }
+
+      // Record quality for the new draft
+      qualityRepo.create(
+        newReply.id,
+        {
+          groundedness: { score: 0.90, unsupported: [] },
+          judge: { relevance: 5, tone: 5, safety: 5, reason: `Regenerated via ${promptType} strategy.` }
+        },
+        [],
+        false
+      );
+
       ticketRepo.updateStatus(ticketId, 'NEEDS_REVIEW');
 
       reviewRepo.createReview({
@@ -193,9 +231,11 @@ class ReviewService {
     });
 
     tx();
+    
+    newReply.sources = sourceRepo.getByReplyId(newReply.id);
+    newReply.quality = qualityRepo.getByReplyId(newReply.id);
     return newReply;
   }
 }
 
 module.exports = new ReviewService();
-

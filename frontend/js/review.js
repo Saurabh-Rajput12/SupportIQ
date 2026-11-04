@@ -58,17 +58,80 @@ async function loadReviewWorkspace(ticketId = null) {
     const reasons = analysis?.priority_reasons || [];
     const isApproved = reply.status === 'APPROVED';
 
+    const sources = reply.sources || [];
+    const quality = reply.quality || {};
+    const groundedScore = quality.groundedness !== undefined && quality.groundedness !== null ? quality.groundedness : null;
+    const unsupportedClaims = quality.unsupported || [];
+    const similarTickets = quality.similar || [];
+    const isDuplicate = quality.is_duplicate;
+
+    // Groundedness Badge
+    let groundedBadge = '';
+    if (groundedScore !== null) {
+      const pct = Math.round(groundedScore * 100);
+      if (groundedScore >= 0.8) {
+        groundedBadge = `<span class="badge" style="background:#dcfce7; color:#15803d; border:1px solid #86efac; font-size:0.75rem;">🛡️ Grounded (${pct}%)</span>`;
+      } else if (groundedScore >= 0.5) {
+        groundedBadge = `<span class="badge" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a; font-size:0.75rem;">⚠️ Partially Grounded (${pct}%)</span>`;
+      } else {
+        groundedBadge = `<span class="badge" style="background:#fee2e2; color:#b91c1c; border:1px solid #fca5a5; font-size:0.75rem;">⚠️ Low Grounding (${pct}%)</span>`;
+      }
+    }
+
+    // Judge score chips
+    let judgeHtml = '';
+    if (quality.judge_relevance || quality.judge_tone || quality.judge_safety) {
+      judgeHtml = `
+        <div style="display:flex; flex-wrap:wrap; gap:0.4rem; align-items:center; margin-top:0.4rem; font-size:0.75rem;">
+          <span style="font-weight:700; color:#475569;">LLM Judge:</span>
+          <span style="background:#eff6ff; color:#1d4ed8; padding:2px 7px; border-radius:4px; font-weight:600;">Relevance: ${quality.judge_relevance || '-'}/5</span>
+          <span style="background:#f0fdf4; color:#15803d; padding:2px 7px; border-radius:4px; font-weight:600;">Tone: ${quality.judge_tone || '-'}/5</span>
+          <span style="background:${quality.judge_safety === 1 ? '#fee2e2; color:#b91c1c;' : '#faf5ff; color:#7e22ce;'} padding:2px 7px; border-radius:4px; font-weight:600;">Safety: ${quality.judge_safety || '-'}/5</span>
+          ${quality.judge_reason ? `<span style="color:#64748b; font-style:italic;">"${escapeHtml(quality.judge_reason)}"</span>` : ''}
+        </div>
+      `;
+    }
+
+    // Sources List HTML
+    let sourcesHtml = '';
+    if (sources.length > 0) {
+      sourcesHtml = `
+        <div class="card p-3 mt-3" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+            <h4 style="font-size:0.9rem; font-weight:700; color:#1e293b; margin:0;">📚 Retrieved Company Knowledge (RAG Context)</h4>
+            <span style="font-size:0.75rem; color:#64748b;">${sources.length} sources linked</span>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:0.45rem;">
+            ${sources.map((s, idx) => `
+              <details style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:0.4rem 0.65rem; font-size:0.8rem;">
+                <summary style="cursor:pointer; font-weight:600; color:#1e293b;">
+                  [${idx + 1}] (${escapeHtml(s.doc_type)}) ${escapeHtml(s.title || s.doc_id)}
+                  ${s.score !== null ? `<span style="font-size:0.72rem; color:#2563eb; margin-left:6px; font-weight:500;">Match: ${(s.score * 100).toFixed(0)}%</span>` : ''}
+                </summary>
+                <div style="margin-top:0.35rem; color:#475569; font-size:0.78rem; border-top:1px dashed #cbd5e1; padding-top:0.35rem; line-height:1.45;">
+                  ${escapeHtml(s.snippet || 'No text snippet')}
+                </div>
+              </details>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
     container.innerHTML = `
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem; background:#ffffff; padding:1.2rem; border-radius:10px; border:1px solid #e2e8f0;">
         <div>
-          <div style="display:flex; align-items:center; gap:0.6rem;">
+          <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
             <h2 style="font-size:1.25rem; font-weight:800; color:#0f172a; margin-bottom:0;">${escapeHtml(t.ticket_code)}: ${escapeHtml(t.subject)}</h2>
             <span class="badge badge-status-${escapeHtml(reply.status)}">${escapeHtml(reply.status)}</span>
+            ${isDuplicate ? '<span class="badge" style="background:#fee2e2; color:#b91c1c; font-weight:700;">🚨 Possible Duplicate</span>' : ''}
+            ${groundedBadge}
           </div>
           <div style="font-size:0.8rem; color:#64748b; margin-top:4px;">
             Customer: <strong>${escapeHtml(t.customer_name || 'N/A')}</strong> |
             Triage Level: <span class="badge badge-${(t.effective_priority || 'LOW').toLowerCase()}">${escapeHtml(t.effective_priority || 'LOW')}</span> |
-            Strategy: <code>${escapeHtml(reply.prompt_type)}</code> (v${reply.version})
+            Strategy: <code>${escapeHtml(reply.prompt_type)}</code> (v${reply.version}) |
+            Model: <span style="font-family:monospace; color:#2563eb;">${escapeHtml(reply.model_id || 'Qwen2.5-1.5B')}</span>
           </div>
         </div>
         <div style="display:flex; align-items:center; gap:0.6rem;">
@@ -84,7 +147,7 @@ async function loadReviewWorkspace(ticketId = null) {
           <span>🛡️ Human-in-the-Loop AI Governance:</span>
         </div>
         <div style="font-size:0.82rem; margin-top:2px;">
-          SupportIQ creates professional draft responses. Approving a reply records the audit approval and marks it ready, but <strong>does NOT transmit an email or external message</strong>.
+          SupportIQ creates professional draft responses grounded in company knowledge. Approving a reply records the audit approval and marks it ready, but <strong>does NOT transmit an email or external message</strong>. Always verify sources before approving.
         </div>
       </div>
 
@@ -106,20 +169,43 @@ async function loadReviewWorkspace(ticketId = null) {
               <div><strong>T5 Synopsis:</strong> <span style="font-style:italic; color:#334155;">"${escapeHtml(analysis?.summary || 'N/A')}"</span></div>
               <div><strong>Priority Reason Codes:</strong> ${reasons.map(r => `<span style="background:#f1f5f9; padding:2px 6px; border-radius:4px; font-family:monospace; font-size:0.72rem;">${escapeHtml(r)}</span>`).join(' ')}</div>
             </div>
+
+            ${similarTickets.length > 0 ? `
+              <div class="mt-3 pt-2" style="border-top:1px solid #f1f5f9;">
+                <div style="font-weight:700; font-size:0.82rem; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
+                  <span>🔍 Similar Historical Inquiries:</span>
+                  ${isDuplicate ? '<span class="badge" style="background:#fee2e2; color:#b91c1c; font-size:0.7rem;">Likely Duplicate</span>' : ''}
+                </div>
+                ${similarTickets.slice(0, 3).map(st => `
+                  <div style="font-size:0.78rem; background:#f8fafc; border:1px solid #e2e8f0; padding:4px 8px; border-radius:5px; margin-bottom:4px; color:#334155;">
+                    <div style="display:flex; justify-content:space-between;">
+                      <strong>${escapeHtml(st.id)}</strong>
+                      <span style="color:#2563eb; font-weight:600;">${Math.round((st.score || 0) * 100)}% match</span>
+                    </div>
+                    <div style="font-size:0.75rem; color:#64748b; margin-top:2px;">"${escapeHtml(st.text || '')}"</div>
+                  </div>
+                `).join('')}
+              </div>
+            ` : ''}
           </div>
         </div>
 
         <div>
           <div class="card p-3" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-              <h4 style="font-size:0.95rem; font-weight:700; color:#1e293b;">Agent Response Draft (v${reply.version})</h4>
+              <div style="display:flex; align-items:center; gap:0.5rem;">
+                <h4 style="font-size:0.95rem; font-weight:700; color:#1e293b; margin:0;">Agent Response Draft (v${reply.version})</h4>
+                ${groundedBadge}
+              </div>
               <div style="display:flex; gap:0.4rem;">
                 <button class="btn btn-secondary btn-sm" style="padding:2px 8px; font-size:0.75rem;" onclick="copyTextToClipboard(document.getElementById('reply-editor-textarea').value, 'Draft copied!')">Copy Text</button>
               </div>
             </div>
 
+            ${judgeHtml}
+
             <!-- Snippets -->
-            <div style="margin-bottom:0.6rem;">
+            <div style="margin:0.6rem 0;">
               <span style="font-size:0.75rem; color:#64748b; font-weight:600; margin-right:4px;">Quick Snippets:</span>
               <button class="snippet-btn" onclick="insertSnippet('Please provide your 12-digit Acquirer Reference Number (ARN) or merchant ID.')">+ ARN Ref</button>
               <button class="snippet-btn" onclick="insertSnippet('For your security, a temporary protective hold has been placed on your card.')">+ Card Hold</button>
@@ -127,12 +213,21 @@ async function loadReviewWorkspace(ticketId = null) {
             </div>
 
             <div class="form-group mb-2">
-              <textarea id="reply-editor-textarea" class="textarea-field" style="width:100%; min-height:200px; font-family:inherit; line-height:1.55;" oninput="updateWordCount()">${escapeHtml(reply.current_text)}</textarea>
+              <textarea id="reply-editor-textarea" class="textarea-field" style="width:100%; min-height:190px; font-family:inherit; line-height:1.55;" oninput="updateWordCount()">${escapeHtml(reply.current_text)}</textarea>
               <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
                 <span id="char-word-count" style="font-size:0.75rem; color:#64748b;">Calculating...</span>
                 <span style="font-size:0.72rem; color:#94a3b8;">Shortcut: <kbd style="background:#e2e8f0; padding:1px 4px; border-radius:3px;">Cmd/Ctrl + Enter</kbd> to save</span>
               </div>
             </div>
+
+            ${unsupportedClaims.length > 0 ? `
+              <div class="alert alert-warning p-2 mb-2" style="font-size:0.78rem; border-radius:6px;">
+                <strong>⚠️ Claims requiring human agent verification:</strong>
+                <ul style="margin:4px 0 0 16px; padding:0;">
+                  ${unsupportedClaims.map(u => `<li>${escapeHtml(u)}</li>`).join('')}
+                </ul>
+              </div>
+            ` : ''}
 
             <!-- Diff comparison box -->
             <div class="diff-container">
@@ -153,6 +248,8 @@ async function loadReviewWorkspace(ticketId = null) {
               </div>
             </div>
           </div>
+
+          ${sourcesHtml}
         </div>
       </div>
     `;
@@ -205,61 +302,61 @@ async function populateSwitcherOptions() {
   if (!switcher) return;
 
   try {
-    const res = await window.api.getTickets({ limit: 30 });
+    const res = await window.api.getTickets({ limit: 40 });
     const tickets = res.data;
-    switcher.innerHTML = '';
-    tickets.forEach(t => {
-      const opt = document.createElement('option');
-      opt.value = t.id;
-      opt.textContent = `${t.ticket_code} — ${t.subject.substring(0, 32)}... (${t.status})`;
-      if (t.id === activeReviewTicketId) opt.selected = true;
-      switcher.appendChild(opt);
+
+    let html = '';
+    tickets.forEach(ticket => {
+      const isCurrent = ticket.id === activeReviewTicketId;
+      const statusIcon = ticket.status === 'APPROVED' ? '✓' : (ticket.status === 'NEEDS_REVIEW' ? '⚡' : '•');
+      html += `<option value="${ticket.id}" ${isCurrent ? 'selected' : ''}>${statusIcon} ${escapeHtml(ticket.ticket_code)}: ${escapeHtml(ticket.subject.substring(0, 32))}...</option>`;
     });
+
+    switcher.innerHTML = html;
   } catch (e) {
-    console.error(e);
+    console.error('Failed to populate switcher:', e);
   }
 }
 
 async function saveReplyEdit() {
+  if (!activeReviewReplyId) return;
   const textarea = document.getElementById('reply-editor-textarea');
-  if (!textarea || !activeReviewReplyId) return;
+  if (!textarea) return;
 
   const newText = textarea.value.trim();
   if (!newText) {
-    alert('Reply text cannot be empty.');
+    window.api.showToast('Reply text cannot be empty', 'error');
     return;
   }
 
   try {
     await window.api.editReply(activeReviewReplyId, newText);
-    window.api.showToast('Edit saved! If previously approved, approval was reset to review.', 'success');
+    window.api.showToast('Draft edits saved successfully', 'success');
     loadReviewWorkspace(activeReviewTicketId);
-    loadDashboard();
   } catch (err) {
-    alert(`Failed to save edit: ${err.message}`);
+    window.api.showToast('Failed to save edit: ' + err.message, 'error');
   }
 }
 
 async function approveCurrentReply() {
   if (!activeReviewReplyId) return;
 
-  if (!confirm('Approve this response draft? It will be marked APPROVED with sent=false (no email sent).')) {
-    return;
-  }
-
   try {
-    const res = await window.api.approveReply(activeReviewReplyId, 'Approved by authenticated support agent');
-    window.api.showToast('Reply draft approved! (sent=false)', 'success');
+    const res = await window.api.approveReply(activeReviewReplyId, 'Approved by reviewing agent');
+    window.api.showToast('Reply draft approved. Recorded with sent=false (Human-in-the-Loop)', 'success');
     loadReviewWorkspace(activeReviewTicketId);
-    loadDashboard();
   } catch (err) {
-    alert(`Approval failed: ${err.message}`);
+    window.api.showToast('Failed to approve reply: ' + err.message, 'error');
   }
 }
 
 function openRejectModal() {
   const modal = document.getElementById('reject-reply-modal');
-  if (modal) modal.classList.add('active');
+  if (modal) {
+    const textarea = document.getElementById('rejectReason');
+    if (textarea) textarea.value = '';
+    modal.classList.add('active');
+  }
 }
 
 function closeRejectModal() {
@@ -267,25 +364,25 @@ function closeRejectModal() {
   if (modal) modal.classList.remove('active');
 }
 
-async function handleRejectSubmit(event) {
-  event.preventDefault();
-  const form = event.target;
-  const reason = form.rejectReason.value.trim();
+async function handleRejectSubmit(e) {
+  e.preventDefault();
+  if (!activeReviewReplyId) return;
+
+  const textarea = document.getElementById('rejectReason');
+  const reason = textarea ? textarea.value.trim() : '';
 
   if (!reason || reason.length < 3) {
-    alert('Please enter a rejection reason (minimum 3 characters).');
+    window.api.showToast('Rejection reason must be at least 3 characters', 'error');
     return;
   }
 
   try {
     await window.api.rejectReply(activeReviewReplyId, reason);
-    form.reset();
     closeRejectModal();
-    window.api.showToast('Draft rejected and recorded in audit trail.', 'error');
+    window.api.showToast('Reply rejected and reason recorded in audit log', 'info');
     loadReviewWorkspace(activeReviewTicketId);
-    loadDashboard();
   } catch (err) {
-    alert(`Rejection failed: ${err.message}`);
+    window.api.showToast('Failed to reject reply: ' + err.message, 'error');
   }
 }
 
@@ -299,31 +396,39 @@ function closeRegenerateModal() {
   if (modal) modal.classList.remove('active');
 }
 
-async function handleRegenerateSubmit(event) {
-  event.preventDefault();
-  const form = event.target;
-  const promptType = form.promptStrategy.value;
-  const submitBtn = form.querySelector('button[type="submit"]');
+async function handleRegenerateSubmit(e) {
+  e.preventDefault();
+  if (!activeReviewTicketId) return;
 
-  submitBtn.disabled = true;
-  submitBtn.textContent = 'Generating New Version...';
+  const select = document.getElementById('promptStrategy');
+  const promptType = select ? select.value : 'INSTRUCTIONAL';
+
+  closeRegenerateModal();
+  window.api.showToast(`Regenerating draft using ${promptType} strategy...`, 'info');
 
   try {
     await window.api.regenerateReply(activeReviewTicketId, promptType);
-    closeRegenerateModal();
-    window.api.showToast(`New draft version created using ${promptType}!`, 'success');
+    window.api.showToast('New draft version generated successfully', 'success');
     loadReviewWorkspace(activeReviewTicketId);
-    loadDashboard();
   } catch (err) {
-    alert(`Regeneration failed: ${err.message}`);
-  } finally {
-    submitBtn.disabled = false;
-    submitBtn.textContent = 'Generate Draft';
+    window.api.showToast('Failed to regenerate reply: ' + err.message, 'error');
   }
 }
 
-function switchToReviewTab(ticketId) {
-  closeTicketDetailModal();
-  switchView('review');
-  loadReviewWorkspace(ticketId);
+function copyTextToClipboard(text, successMsg = 'Copied to clipboard!') {
+  if (!navigator.clipboard) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea);
+    window.api.showToast(successMsg, 'success');
+    return;
+  }
+  navigator.clipboard.writeText(text).then(() => {
+    window.api.showToast(successMsg, 'success');
+  }).catch(err => {
+    window.api.showToast('Failed to copy: ' + err.message, 'error');
+  });
 }

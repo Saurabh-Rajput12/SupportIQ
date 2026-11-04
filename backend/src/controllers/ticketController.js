@@ -85,7 +85,7 @@ class TicketController {
   async analyzeTicket(req, res, next) {
     try {
       const id = parseInt(req.params.id, 10);
-      const { promptType = 'FEW_SHOT' } = req.body;
+      const { promptType = 'INSTRUCTIONAL' } = req.body;
       const result = await ticketService.analyzeTicket(id, req.user?.id, promptType);
       res.json({
         success: true,

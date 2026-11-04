@@ -1,0 +1,16 @@
+{
+  "dataset": "PolyAI/banking77 (Test Split)",
+  "sample_size": 300,
+  "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+  "vector_dim": 384,
+  "index_type": "IndexFlatIP (Cosine Normalized)",
+  "total_indexed_documents": 1745,
+  "metrics": {
+    "hit_at_1": 0.5033,
+    "hit_at_3": 0.7567,
+    "hit_at_5": 0.8433,
+    "mrr": 0.6348,
+    "avg_latency_ms": 21.77
+  },
+  "evaluated_at": "2026-11-04T07:38:35Z"
+}

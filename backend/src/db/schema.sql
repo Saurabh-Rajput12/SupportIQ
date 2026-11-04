@@ -57,13 +57,39 @@ CREATE TABLE IF NOT EXISTS generated_replies (
   current_text TEXT NOT NULL,
   provider TEXT,
   model_id TEXT,
-  prompt_type TEXT NOT NULL CHECK (prompt_type IN ('ZERO_SHOT','FEW_SHOT','STRUCTURED')),
+  prompt_type TEXT NOT NULL CHECK (prompt_type IN ('ZERO_SHOT','FEW_SHOT','STRUCTURED','INSTRUCTIONAL','CONVERSATIONAL','COT','SELF_CONSISTENCY')),
   prompt_version TEXT NOT NULL,
   status TEXT NOT NULL DEFAULT 'NEEDS_REVIEW'
     CHECK (status IN ('NEEDS_REVIEW','APPROVED','REJECTED','SUPERSEDED')),
   demo_fallback INTEGER NOT NULL DEFAULT 0 CHECK (demo_fallback IN (0,1)),
   created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
   UNIQUE(ticket_id, version)
+);
+
+CREATE TABLE IF NOT EXISTS reply_sources (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  reply_id INTEGER NOT NULL REFERENCES generated_replies(id) ON DELETE CASCADE,
+  rank INTEGER NOT NULL,
+  doc_id TEXT NOT NULL,
+  doc_type TEXT NOT NULL,
+  title TEXT,
+  snippet TEXT,
+  score REAL,
+  created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))
+);
+
+CREATE TABLE IF NOT EXISTS reply_quality (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  reply_id INTEGER NOT NULL UNIQUE REFERENCES generated_replies(id) ON DELETE CASCADE,
+  groundedness REAL,
+  unsupported_json TEXT NOT NULL DEFAULT '[]',
+  judge_relevance INTEGER,
+  judge_tone INTEGER,
+  judge_safety INTEGER,
+  judge_reason TEXT,
+  similar_json TEXT NOT NULL DEFAULT '[]',
+  is_duplicate INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))
 );
 
 CREATE TABLE IF NOT EXISTS agent_review (
@@ -92,5 +118,5 @@ CREATE INDEX IF NOT EXISTS idx_tickets_created ON tickets(created_at);
 CREATE INDEX IF NOT EXISTS idx_tickets_priority ON ticket_analysis(priority_label);
 CREATE INDEX IF NOT EXISTS idx_analysis_ticket ON ticket_analysis(ticket_id, run_number);
 CREATE INDEX IF NOT EXISTS idx_replies_ticket ON generated_replies(ticket_id, version);
+CREATE INDEX IF NOT EXISTS idx_sources_reply ON reply_sources(reply_id);
 CREATE INDEX IF NOT EXISTS idx_history_ticket ON ticket_history(ticket_id, created_at);
-

@@ -5,7 +5,7 @@ class AnalyzeRequest(BaseModel):
     ticket_id: str = Field(min_length=1, max_length=64)
     subject: str = Field(min_length=1, max_length=200)
     description: str = Field(min_length=1, max_length=10000)
-    prompt_type: str = Field(default="FEW_SHOT")
+    prompt_type: str = Field(default="INSTRUCTIONAL")
 
 class IntentPrediction(BaseModel):
     label: str
@@ -38,6 +38,27 @@ class ReplyOutput(BaseModel):
     provider: str
     model_id: str
     demo_fallback: bool
+    warning: Optional[str] = None
+
+class SourceDoc(BaseModel):
+    id: str
+    type: str
+    title: Optional[str] = None
+    text: Optional[str] = None
+    score: Optional[float] = None
+    intent: Optional[str] = None
+
+class QualityOutput(BaseModel):
+    groundedness: Optional[Dict[str, Any]] = None
+    judge: Optional[Dict[str, Any]] = None
+
+class SimilarTicket(BaseModel):
+    id: str
+    type: str = "PAST_TICKET"
+    intent: Optional[str] = None
+    title: Optional[str] = None
+    text: str
+    score: float
 
 class AnalyzeResponse(BaseModel):
     request_id: str
@@ -47,6 +68,10 @@ class AnalyzeResponse(BaseModel):
     priority: PriorityRecommendation
     summary: SummaryOutput
     reply: ReplyOutput
+    sources: List[SourceDoc] = []
+    quality: Optional[QualityOutput] = None
+    similar_tickets: List[SimilarTicket] = []
+    is_duplicate: bool = False
     processing_ms: int
     warnings: List[str] = []
 
@@ -63,5 +88,25 @@ class ReplyGenerateRequest(BaseModel):
     sentiment: str
     priority: str
     summary: str
-    prompt_type: str = "FEW_SHOT"
+    prompt_type: str = "INSTRUCTIONAL"
+    context_docs: Optional[List[Dict[str, Any]]] = None
 
+class RetrieveRequest(BaseModel):
+    query: str = Field(min_length=1, max_length=2000)
+    k: int = Field(default=3, ge=1, le=20)
+    doc_types: Optional[List[str]] = None
+    min_score: float = Field(default=0.0, ge=0.0, le=1.0)
+
+class RetrieveResponse(BaseModel):
+    query: str
+    count: int
+    docs: List[SourceDoc]
+
+class SimilarRequest(BaseModel):
+    query: str = Field(min_length=1, max_length=2000)
+    k: int = Field(default=3, ge=1, le=10)
+
+class SimilarResponse(BaseModel):
+    query: str
+    similar_tickets: List[SimilarTicket]
+    is_duplicate: bool

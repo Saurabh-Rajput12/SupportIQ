@@ -175,6 +175,14 @@ class ApiClient {
   async getDistributions() {
     return this.request('/analytics/distributions');
   }
+
+  async getPromptEval() {
+    return this.request('/analytics/prompt-eval');
+  }
+
+  async getRetrievalEval() {
+    return this.request('/analytics/retrieval-eval');
+  }
 }
 
 function escapeHtml(str) {

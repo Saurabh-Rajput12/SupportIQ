@@ -32,9 +32,9 @@ class MLClient {
     }
   }
 
-  async analyzeTicket({ ticket_id, subject, description, prompt_type = 'FEW_SHOT' }) {
+  async analyzeTicket({ ticket_id, subject, description, prompt_type = 'INSTRUCTIONAL' }) {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 120000); // 2 min timeout for cold model inference
+    const timeout = setTimeout(() => controller.abort(), 300000); // 5 min timeout for LLM + RAG + Judge
     try {
       const response = await fetch(`${this.baseUrl}/api/v1/analyze`, {
         method: 'POST',
@@ -51,7 +51,7 @@ class MLClient {
       return await response.json();
     } catch (err) {
       if (err.name === 'AbortError') {
-        throw new Error('ML Service request timed out after 120 seconds.');
+        throw new Error('ML Service request timed out after 300 seconds.');
       }
       throw err;
     } finally {
@@ -59,14 +59,22 @@ class MLClient {
     }
   }
 
-  async regenerateReply({ ticket_text, intent, sentiment, priority, summary, prompt_type = 'FEW_SHOT' }) {
+  async regenerateReply({ ticket_text, intent, sentiment, priority, summary, prompt_type = 'INSTRUCTIONAL', context_docs = null }) {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 60000);
+    const timeout = setTimeout(() => controller.abort(), 120000);
     try {
       const response = await fetch(`${this.baseUrl}/api/v1/reply/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ticket_text, intent, sentiment, priority, summary, prompt_type }),
+        body: JSON.stringify({
+          ticket_text,
+          intent,
+          sentiment,
+          priority,
+          summary,
+          prompt_type,
+          context_docs,
+        }),
         signal: controller.signal,
       });
 
@@ -80,7 +88,26 @@ class MLClient {
       clearTimeout(timeout);
     }
   }
+
+  async retrieveDocs({ query, k = 3, doc_types = null, min_score = 0.0 }) {
+    const res = await fetch(`${this.baseUrl}/api/v1/retrieve`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, k, doc_types, min_score }),
+    });
+    if (!res.ok) throw new Error('Failed to retrieve docs from ML service');
+    return await res.json();
+  }
+
+  async findSimilar({ query, k = 3 }) {
+    const res = await fetch(`${this.baseUrl}/api/v1/similar`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, k }),
+    });
+    if (!res.ok) throw new Error('Failed to search similar tickets in ML service');
+    return await res.json();
+  }
 }
 
 module.exports = new MLClient();
-

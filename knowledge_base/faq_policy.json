@@ -1,0 +1,541 @@
+[
+  {
+    "id": "FAQ-activate_my_card",
+    "type": "FAQ",
+    "intent": "activate_my_card",
+    "title": "Card Activation Procedure",
+    "text": "To activate your new physical card, open the Card tab in the mobile app and select Activate Card, or make an initial chip and PIN transaction at any standard ATM. Virtual cards are activated instantly upon generation and require no physical activation."
+  },
+  {
+    "id": "POL-age_limit",
+    "type": "POLICY",
+    "intent": "age_limit",
+    "title": "Account Eligibility and Age Limit",
+    "text": "Customers must be at least 18 years old to open a primary individual account. For minors aged 13-17, a parent or legal guardian can sponsor a youth pocket sub-account with parental oversight and spending limits."
+  },
+  {
+    "id": "FAQ-apple_pay_or_google_pay",
+    "type": "FAQ",
+    "intent": "apple_pay_or_google_pay",
+    "title": "Digital Wallet Integration",
+    "text": "Both physical and virtual Mastercard and Visa cards can be added to Apple Pay or Google Pay directly from the Card Details page in the mobile application. Ensure NFC is enabled on your mobile device for contactless in-store payments."
+  },
+  {
+    "id": "FAQ-atm_support",
+    "type": "FAQ",
+    "intent": "atm_support",
+    "title": "ATM Compatibility and Global Acceptance",
+    "text": "Our debit cards work at all automated teller machines globally displaying the Mastercard or Visa network acceptance marks. ATM operators may occasionally charge local network access fees outside our control."
+  },
+  {
+    "id": "POL-automatic_top_up",
+    "type": "POLICY",
+    "intent": "automatic_top_up",
+    "title": "Auto Top-Up Rules and Thresholds",
+    "text": "Automatic top-up can be configured under Account Settings. When your active balance drops below your chosen threshold, funds are debited from your linked backup card or account. Maximum daily automatic replenishment limits apply to protect against fraud."
+  },
+  {
+    "id": "FAQ-balance_not_updated_after_bank_transfer",
+    "type": "FAQ",
+    "intent": "balance_not_updated_after_bank_transfer",
+    "title": "Delayed Inbound Bank Transfer",
+    "text": "Domestic transfers via standard clearing systems typically settle within a few minutes, but can take up to 1-2 business days depending on sender institution cut-offs. If the balance has not reflected after 48 hours, provide the payment receipt with transaction reference to support."
+  },
+  {
+    "id": "POL-balance_not_updated_after_cheque_or_cash_deposit",
+    "type": "POLICY",
+    "intent": "balance_not_updated_after_cheque_or_cash_deposit",
+    "title": "Cash and Cheque Deposit Clearance",
+    "text": "Cash deposits at authorized partner retail points reflect within 30 minutes. Cheque deposits require 3 to 5 business days for bank clearance and fraud verification before funds become available in your spendable ledger."
+  },
+  {
+    "id": "POL-beneficiary_not_allowed",
+    "type": "POLICY",
+    "intent": "beneficiary_not_allowed",
+    "title": "Beneficiary Validation and Sanctions Policy",
+    "text": "Transfers to certain external payees may be restricted due to international sanctions, unsupported beneficiary banks, or risk screening triggers. Verify that the recipient IBAN, BIC, and legal name match bank records exactly."
+  },
+  {
+    "id": "POL-cancel_transfer",
+    "type": "POLICY",
+    "intent": "cancel_transfer",
+    "title": "Outbound Transfer Cancellation Rules",
+    "text": "Transfers that are in pending processing can be canceled immediately in the app transfer history. Transfers that have already been routed to the external settlement clearing network cannot be recalled automatically; an official indemnity recall request must be filed."
+  },
+  {
+    "id": "FAQ-card_about_to_expire",
+    "type": "FAQ",
+    "intent": "card_about_to_expire",
+    "title": "Card Expiry and Automatic Reissue",
+    "text": "Replacement cards are automatically manufactured and dispatched to your registered postal address 30 days prior to expiration. Verify that your delivery address is up to date in personal settings before dispatch."
+  },
+  {
+    "id": "POL-card_acceptance",
+    "type": "POLICY",
+    "intent": "card_acceptance",
+    "title": "Global Card Acceptance Guidelines",
+    "text": "Our cards are accepted by millions of merchants worldwide that display the Mastercard or Visa symbol, both in-store and online. Certain high-risk merchant categories such as unlicensed gambling or crypto brokers may be blocked."
+  },
+  {
+    "id": "FAQ-card_arrival",
+    "type": "FAQ",
+    "intent": "card_arrival",
+    "title": "Tracking Card Delivery",
+    "text": "Standard postal delivery takes 5-7 business days within the country, while express courier takes 2-3 business days. You can track your parcel dispatch status directly in the Card Management section of your application."
+  },
+  {
+    "id": "FAQ-card_delivery_estimate",
+    "type": "FAQ",
+    "intent": "card_delivery_estimate",
+    "title": "Estimated Delivery Timeframes",
+    "text": "Delivery estimates are displayed at the time of card ordering and updated in the app. If your card has not arrived within 10 business days of dispatch, please request a complimentary card replacement."
+  },
+  {
+    "id": "FAQ-card_linking",
+    "type": "FAQ",
+    "intent": "card_linking",
+    "title": "Linking External Bank Cards",
+    "text": "You can link eligible external debit or credit cards to fund your wallet easily. The linked card must be issued in your legal name and support 3D Secure biometric confirmation."
+  },
+  {
+    "id": "FAQ-card_not_working",
+    "type": "FAQ",
+    "intent": "card_not_working",
+    "title": "Troubleshooting Inactive or Blocked Cards",
+    "text": "If your card transaction fails, check if the card is frozen in the app, confirm that contactless or online transactions are enabled, and ensure your account has sufficient settled balance."
+  },
+  {
+    "id": "POL-card_payment_fee_charged",
+    "type": "POLICY",
+    "intent": "card_payment_fee_charged",
+    "title": "Card Payment Surcharges and Fees",
+    "text": "We do not charge standard interchange fees for card purchases. Any additional fee appearing on checkout is typically an independent merchant surcharge or currency conversion markup charged by the seller."
+  },
+  {
+    "id": "POL-card_payment_not_recognised",
+    "type": "POLICY",
+    "intent": "card_payment_not_recognised",
+    "title": "Unrecognised Card Payment Dispute",
+    "text": "If you do not recognize a card payment, immediately freeze your card in the app to prevent further charges. Our fraud operations team investigates unauthorized charges; no immediate chargeback credit is guaranteed prior to formal merchant dispute assessment."
+  },
+  {
+    "id": "POL-card_payment_wrong_exchange_rate",
+    "type": "POLICY",
+    "intent": "card_payment_wrong_exchange_rate",
+    "title": "Foreign Exchange Rates for Card Transactions",
+    "text": "Card transactions in foreign currencies use the live interbank exchange rate plus any applicable weekend markup. The rate applied at merchant authorization is provisional and finalized upon clearing settlement within 2-3 days."
+  },
+  {
+    "id": "FAQ-card_swallowed",
+    "type": "FAQ",
+    "intent": "card_swallowed",
+    "title": "Card Retained by ATM Machine",
+    "text": "If an automated teller machine retains your card, immediately freeze the card in your mobile app for security. Retained cards cannot be retrieved from third-party ATMs; a replacement card must be ordered through the app."
+  },
+  {
+    "id": "POL-cash_withdrawal_charge",
+    "type": "POLICY",
+    "intent": "cash_withdrawal_charge",
+    "title": "ATM Cash Withdrawal Allowances and Fees",
+    "text": "Standard accounts include a monthly free cash withdrawal allowance of up to 200 currency units per rolling 30-day window. Cash withdrawals exceeding this threshold incur a 2% fair-usage processing fee."
+  },
+  {
+    "id": "POL-cash_withdrawal_not_recognised",
+    "type": "POLICY",
+    "intent": "cash_withdrawal_not_recognised",
+    "title": "Disputing Unrecognized ATM Withdrawals",
+    "text": "If you identify an ATM withdrawal that you did not authorize, freeze your card instantly and check your physical card possession. Submit an ATM dispute report including the ATM location, terminal ID, and timestamp."
+  },
+  {
+    "id": "FAQ-change_pin",
+    "type": "FAQ",
+    "intent": "change_pin",
+    "title": "Changing or Resetting Card PIN",
+    "text": "You can view your current PIN anytime under Card Security in the app after biometric authentication. To change your PIN, visit any compatible ATM and choose PIN Services -> Change PIN."
+  },
+  {
+    "id": "POL-compromised_card",
+    "type": "POLICY",
+    "intent": "compromised_card",
+    "title": "Emergency Card Compromise and Fraud Protocol",
+    "text": "If your card details have been compromised, lost, or intercepted online, immediately freeze the card and choose Terminate and Replace in the app. Review your recent transactions and report any unauthorized charges."
+  },
+  {
+    "id": "FAQ-contactless_not_working",
+    "type": "FAQ",
+    "intent": "contactless_not_working",
+    "title": "Contactless Payment Limits and Reset",
+    "text": "For security regulations under PSD2/SCA, contactless chip payments reset after cumulative spending reaches 150 units or 5 contactless transactions. To reset contactless, insert your card into a terminal and enter your chip PIN."
+  },
+  {
+    "id": "POL-country_support",
+    "type": "POLICY",
+    "intent": "country_support",
+    "title": "Supported Jurisdictions and Geographies",
+    "text": "We currently offer full banking services across the EEA, UK, Switzerland, and select international jurisdictions. Residents outside these jurisdictions cannot register accounts due to regulatory constraints."
+  },
+  {
+    "id": "FAQ-declined_card_payment",
+    "type": "FAQ",
+    "intent": "declined_card_payment",
+    "title": "Understanding Declined Card Transactions",
+    "text": "Card payments are most commonly declined due to insufficient available funds, incorrect CVV, exceeding daily velocity limits, or security fraud blocks. Check the specific decline reason in the transaction detail screen."
+  },
+  {
+    "id": "FAQ-declined_cash_withdrawal",
+    "type": "FAQ",
+    "intent": "declined_cash_withdrawal",
+    "title": "Declined ATM Cash Withdrawal Causes",
+    "text": "ATM withdrawals can fail if your daily cash limit is exceeded, incorrect PIN is entered 3 consecutive times, or the ATM terminal lacks sufficient cash notes. Check your remaining monthly ATM quota in the app."
+  },
+  {
+    "id": "FAQ-declined_transfer",
+    "type": "FAQ",
+    "intent": "declined_transfer",
+    "title": "Declined Outbound Bank Transfer Causes",
+    "text": "Transfers are declined when available balance is inadequate, beneficiary details fail validation, or anti-fraud rules flag unusual velocity. Review your transfer details and retry after verifying recipient credentials."
+  },
+  {
+    "id": "POL-direct_debit_payment_not_recognised",
+    "type": "POLICY",
+    "intent": "direct_debit_payment_not_recognised",
+    "title": "Unrecognised Direct Debit Mandate Dispute",
+    "text": "If an unrecognised direct debit appears, you can cancel the mandate and request a refund under the Direct Debit Guarantee within 8 weeks of the debit date directly from your payments screen."
+  },
+  {
+    "id": "POL-disposable_card_limits",
+    "type": "POLICY",
+    "intent": "disposable_card_limits",
+    "title": "Disposable Virtual Card Usage Rules",
+    "text": "Disposable virtual cards automatically regenerate a fresh card number, expiry, and CVV after every single online transaction. They cannot be used for recurring merchant subscriptions, car rentals, or hotel deposit authorizations."
+  },
+  {
+    "id": "POL-edit_personal_details",
+    "type": "POLICY",
+    "intent": "edit_personal_details",
+    "title": "Updating Legal Name and Address",
+    "text": "To update personal contact details such as email or mobile phone, navigate to Profile Settings. Changing your legal name, registered residential address, or nationality requires submitting official proof of address or passport documentation."
+  },
+  {
+    "id": "POL-exchange_charge",
+    "type": "POLICY",
+    "intent": "exchange_charge",
+    "title": "Currency Exchange Fees and Markups",
+    "text": "Currency exchanges completed on weekdays within your monthly tier allowance are fee-free. Exchanges performed over the weekend incur a 0.5% to 1.0% liquidity buffer fee due to foreign exchange market closure."
+  },
+  {
+    "id": "FAQ-exchange_rate",
+    "type": "FAQ",
+    "intent": "exchange_rate",
+    "title": "Real-Time Interbank Exchange Rates",
+    "text": "We utilize real-time interbank market exchange rates without hidden spreads during market open hours. The live rate quote is locked for 30 seconds upon previewing your transfer or currency swap."
+  },
+  {
+    "id": "FAQ-exchange_via_app",
+    "type": "FAQ",
+    "intent": "exchange_via_app",
+    "title": "Exchanging Currencies in the Mobile App",
+    "text": "To exchange currencies, tap the Exchange icon on the home dashboard, select your sell and buy currencies, review the locked rate quote, and confirm the transaction. The exchanged funds credit your balance instantaneously."
+  },
+  {
+    "id": "FAQ-extra_charge_on_statement",
+    "type": "FAQ",
+    "intent": "extra_charge_on_statement",
+    "title": "Unexpected Statement Charges and Fees",
+    "text": "Unexpected statement charges are often merchant hold pre-authorizations, tip adjustments, or cross-border payment surcharges. Tap on the charge in your statement to view the complete merchant breakdown."
+  },
+  {
+    "id": "FAQ-failed_transfer",
+    "type": "FAQ",
+    "intent": "failed_transfer",
+    "title": "Troubleshooting Failed Wire Transfers",
+    "text": "Transfers can fail if beneficiary account numbers are mistyped, the receiving institution is unreachable, or beneficiary bank details fail AML screening. Funds from failed transfers are credited back to your balance within 1-2 business days."
+  },
+  {
+    "id": "FAQ-fiat_currency_support",
+    "type": "FAQ",
+    "intent": "fiat_currency_support",
+    "title": "Supported Fiat Currencies",
+    "text": "Our multi-currency accounts support holding, receiving, and spending in over 30 global fiat currencies including USD, EUR, GBP, CAD, AUD, JPY, and CHF. Check the full currency list in the Account Balances menu."
+  },
+  {
+    "id": "FAQ-get_disposable_virtual_card",
+    "type": "FAQ",
+    "intent": "get_disposable_virtual_card",
+    "title": "Creating a Disposable Virtual Card",
+    "text": "To generate a disposable virtual card for secure e-commerce shopping, go to Cards -> Add New Card -> Virtual -> Disposable. The card credentials activate instantly and renew after each merchant authorization."
+  },
+  {
+    "id": "FAQ-get_physical_card",
+    "type": "FAQ",
+    "intent": "get_physical_card",
+    "title": "Ordering a New Physical Debit Card",
+    "text": "To order a physical debit card, visit the Cards tab, tap Get Card, choose your card design, verify your delivery address, and confirm. Delivery tracking will be enabled once your card is manufactured."
+  },
+  {
+    "id": "POL-getting_spare_card",
+    "type": "POLICY",
+    "intent": "getting_spare_card",
+    "title": "Ordering Backup or Spare Physical Cards",
+    "text": "Customers can maintain up to 3 active physical cards simultaneously for travel or backup convenience. Order an additional card via the Cards section; replacement or spare card issuance fees may apply depending on your tier."
+  },
+  {
+    "id": "FAQ-getting_virtual_card",
+    "type": "FAQ",
+    "intent": "getting_virtual_card",
+    "title": "Generating Standard Multi-Use Virtual Cards",
+    "text": "You can create multi-use virtual cards for continuous digital subscriptions and Apple/Google Pay. Go to Cards -> Add Virtual Card. Virtual cards have custom monthly spending limits and instant freeze controls."
+  },
+  {
+    "id": "POL-lost_or_stolen_card",
+    "type": "POLICY",
+    "intent": "lost_or_stolen_card",
+    "title": "Immediate Action for Lost or Stolen Cards",
+    "text": "If your card is lost or stolen, immediately open the app and freeze the card under Card Management, or report it stolen to permanently block it and order a replacement. This protects you against liability for unauthorized transactions."
+  },
+  {
+    "id": "POL-lost_or_stolen_phone",
+    "type": "POLICY",
+    "intent": "lost_or_stolen_phone",
+    "title": "Securing Account After Device Loss",
+    "text": "If your mobile phone is lost or stolen, contact our emergency helpline or log in from a trusted browser to revoke active mobile device sessions. Your funds and card operations will remain secured behind biometric encryption."
+  },
+  {
+    "id": "FAQ-order_physical_card",
+    "type": "FAQ",
+    "intent": "order_physical_card",
+    "title": "Placing Physical Card Orders",
+    "text": "Order physical cards directly from the Cards hub. Select your preferred shipping method (Standard Postal or Priority DHL Express) and confirm your postal code before submitting."
+  },
+  {
+    "id": "POL-passcode_forgotten",
+    "type": "POLICY",
+    "intent": "passcode_forgotten",
+    "title": "App Passcode and Credential Reset",
+    "text": "If you forgot your 6-digit application passcode, tap Forgot Passcode on the login screen. You will receive an SMS verification code followed by a mandatory selfie biometric verification to safely reset your passcode."
+  },
+  {
+    "id": "FAQ-pending_card_payment",
+    "type": "FAQ",
+    "intent": "pending_card_payment",
+    "title": "Understanding Pending Card Authorizations",
+    "text": "A pending card payment is a temporary merchant pre-authorization hold. The merchant has up to 7-10 business days to claim or release the hold. If unclaimed by the merchant, funds are automatically released back to your balance."
+  },
+  {
+    "id": "FAQ-pending_cash_withdrawal",
+    "type": "FAQ",
+    "intent": "pending_cash_withdrawal",
+    "title": "Pending ATM Cash Authorizations",
+    "text": "Pending cash withdrawals occur when an ATM reserves funds during a withdrawal attempt. If the ATM failed to dispense cash, the reserved hold usually reverses automatically within 48 to 72 hours."
+  },
+  {
+    "id": "FAQ-pending_top_up",
+    "type": "FAQ",
+    "intent": "pending_top_up",
+    "title": "Pending Top-Up Processing Times",
+    "text": "Top-ups from debit cards usually process within seconds. If a top-up status remains pending, it is undergoing fraud security checks with your card issuing bank, which can take up to 2 hours."
+  },
+  {
+    "id": "FAQ-pending_transfer",
+    "type": "FAQ",
+    "intent": "pending_transfer",
+    "title": "Pending Wire and Account Transfers",
+    "text": "Pending outgoing transfers are typically awaiting scheduled payment cut-off batches or routine compliance sanction checks. Most transfers clear within a few hours during standard business working days."
+  },
+  {
+    "id": "FAQ-pin_blocked",
+    "type": "FAQ",
+    "intent": "pin_blocked",
+    "title": "Unblocking Card PIN After Incorrect Attempts",
+    "text": "If your card PIN is blocked after 3 consecutive incorrect entries, open the app, go to Cards -> PIN & Security, and tap Unblock PIN. Then validate the reset at any ATM terminal with a balance inquiry."
+  },
+  {
+    "id": "FAQ-receiving_money",
+    "type": "FAQ",
+    "intent": "receiving_money",
+    "title": "Receiving Inbound Domestic and International Funds",
+    "text": "To receive funds into your account, share your unique account number, sort code, IBAN, and BIC found under Account Details on your home tab. Ensure the sender specifies your full legal name on the transfer reference."
+  },
+  {
+    "id": "POL-Refund_not_showing_up",
+    "type": "POLICY",
+    "intent": "Refund_not_showing_up",
+    "title": "Merchant Refund Processing Times",
+    "text": "Merchant refunds take between 5 to 10 business days to settle and appear in your transaction feed after the merchant initiates the credit. If more than 10 business days have elapsed, provide the official merchant refund receipt with ARN code."
+  },
+  {
+    "id": "POL-request_refund",
+    "type": "POLICY",
+    "intent": "request_refund",
+    "title": "Initiating Transaction Refund Disputes",
+    "text": "Refund requests should first be addressed directly with the merchant where the goods or services were purchased. If the merchant refuses to cooperate or is unresponsive, submit a formal dispute with merchant communication records."
+  },
+  {
+    "id": "FAQ-reverted_card_payment?",
+    "type": "FAQ",
+    "intent": "reverted_card_payment?",
+    "title": "Reverted Card Payment Explanations",
+    "text": "A card payment reversion occurs when a merchant cancels a prior authorization hold or fails to collect the funds within the clearing settlement deadline. Reverted funds return directly to your available balance."
+  },
+  {
+    "id": "POL-supported_cards_and_currencies",
+    "type": "POLICY",
+    "intent": "supported_cards_and_currencies",
+    "title": "Accepted Top-Up Methods and Supported Currencies",
+    "text": "We accept debit and credit card top-ups from Visa and Mastercard issued in your legal name. We do not support prepaid vouchers, commercial cards, American Express, or third-party anonymous cards."
+  },
+  {
+    "id": "POL-terminate_account",
+    "type": "POLICY",
+    "intent": "terminate_account",
+    "title": "Account Closure and Balance Withdrawal Rules",
+    "text": "To close your account, ensure your account balance is exactly zero and all pending card transactions have fully settled. Then navigate to Settings -> Security -> Close Account. Any residual balance must be transferred prior to closure."
+  },
+  {
+    "id": "POL-top_up_by_bank_transfer_charge",
+    "type": "POLICY",
+    "intent": "top_up_by_bank_transfer_charge",
+    "title": "Fees for Inbound Bank Wire Top-Ups",
+    "text": "We do not charge any fee for receiving domestic bank transfers or SEPA transfers. Inbound SWIFT international wires may be subject to intermediary correspondent banking fees beyond our control."
+  },
+  {
+    "id": "POL-top_up_by_card_charge",
+    "type": "POLICY",
+    "intent": "top_up_by_card_charge",
+    "title": "Card Top-Up Surcharges",
+    "text": "Standard personal debit cards issued within your local region incur zero top-up fees. Top-ups using cross-border cards, commercial corporate cards, or credit cards may incur a 1.5% interchange processing surcharge."
+  },
+  {
+    "id": "FAQ-top_up_by_cash_or_cheque",
+    "type": "FAQ",
+    "intent": "top_up_by_cash_or_cheque",
+    "title": "Depositing Cash or Cheques",
+    "text": "Cash deposits can be completed at verified partner retail locations by generating an in-app barcode deposit slip. Cheque deposits can be scanned through mobile check deposit where permitted by regional regulations."
+  },
+  {
+    "id": "FAQ-top_up_failed",
+    "type": "FAQ",
+    "intent": "top_up_failed",
+    "title": "Reasons for Failed Account Top-Ups",
+    "text": "Top-up attempts fail when the source card bank declines the 3D Secure authentication challenge, daily account deposit thresholds are exceeded, or the funding card is reported lost. Contact your card issuing bank for details."
+  },
+  {
+    "id": "POL-top_up_limits",
+    "type": "POLICY",
+    "intent": "top_up_limits",
+    "title": "Annual and Daily Account Deposit Limits",
+    "text": "Deposit allowances are determined by your identity verification tier and anti-money laundering account history. You can view your current daily, monthly, and annual deposit limits under Account Profile -> Limits."
+  },
+  {
+    "id": "POL-top_up_reverted",
+    "type": "POLICY",
+    "intent": "top_up_reverted",
+    "title": "Reversal of Account Top-Ups",
+    "text": "A top-up is reverted if your funding bank recalls the transaction due to suspected unauthorized activity or insufficient funding source settlement. Any corresponding balance will be deducted immediately."
+  },
+  {
+    "id": "FAQ-topping_up_by_card",
+    "type": "FAQ",
+    "intent": "topping_up_by_card",
+    "title": "How to Top Up Using a Debit or Credit Card",
+    "text": "To top up instantly, tap Add Money on the main dashboard, enter the desired deposit amount, select your saved card or enter new card details, and complete 3D Secure verification with your bank."
+  },
+  {
+    "id": "POL-transaction_charged_twice",
+    "type": "POLICY",
+    "intent": "transaction_charged_twice",
+    "title": "Handling Duplicate or Double Charges",
+    "text": "If a merchant transaction appears twice, check if one of the records is marked pending. Duplicate authorization holds typically drop off within 7 business days; if both charges settle, submit a duplicate charge dispute claim."
+  },
+  {
+    "id": "POL-transfer_fee_charged",
+    "type": "POLICY",
+    "intent": "transfer_fee_charged",
+    "title": "Transfer Fee Explanations and Disclosures",
+    "text": "Standard domestic bank transfers and SEPA payments are completely fee-free. International SWIFT wires or expedited clearing transfers include transparent fee breakdowns displayed prior to confirmation."
+  },
+  {
+    "id": "FAQ-transfer_into_account",
+    "type": "FAQ",
+    "intent": "transfer_into_account",
+    "title": "Receiving Inbound Bank Transfers",
+    "text": "Funds transferred using your unique account IBAN or local routing coordinates are credited to your spendable ledger as soon as settlement confirmation is received from the central banking network."
+  },
+  {
+    "id": "POL-transfer_not_received_by_recipient",
+    "type": "POLICY",
+    "intent": "transfer_not_received_by_recipient",
+    "title": "Tracing Outgoing Missing Transfers",
+    "text": "If a transfer has not arrived after the estimated clearing timeframe, confirm that the recipient credentials match exactly. Request an official banking MT103 confirmation receipt from support to enable recipient bank tracing."
+  },
+  {
+    "id": "FAQ-transfer_timing",
+    "type": "FAQ",
+    "intent": "transfer_timing",
+    "title": "Standard Transfer Settlement Windows",
+    "text": "Domestic real-time payments settle within seconds to 2 hours. Standard SEPA credit transfers take 1 business day, and international SWIFT cross-border wires take 3 to 5 business days."
+  },
+  {
+    "id": "POL-unable_to_verify_identity",
+    "type": "POLICY",
+    "intent": "unable_to_verify_identity",
+    "title": "Identity Verification Document Troubleshooting",
+    "text": "If your ID verification was rejected, ensure your document is valid and unexpired, all four corners are clearly visible without glare or blur, and the legal name matches your account details. Resubmit via the in-app verification flow."
+  },
+  {
+    "id": "POL-verify_my_identity",
+    "type": "POLICY",
+    "intent": "verify_my_identity",
+    "title": "Customer Due Diligence (KYC) Requirements",
+    "text": "Financial compliance laws require all account holders to verify identity by submitting a valid government-issued passport or national ID card along with a live biometric facial scan."
+  },
+  {
+    "id": "POL-verify_source_of_funds",
+    "type": "POLICY",
+    "intent": "verify_source_of_funds",
+    "title": "Source of Funds Compliance Review",
+    "text": "When account deposits exceed regulatory thresholds, compliance mandates proof of source of funds such as recent salary payslips, tax returns, or sale of property deeds. Documents are reviewed securely within 2-3 business days."
+  },
+  {
+    "id": "POL-verify_top_up",
+    "type": "POLICY",
+    "intent": "verify_top_up",
+    "title": "Card Ownership and Top-Up Authorization Checks",
+    "text": "To verify ownership of a top-up card, we may charge a small refundable authorization amount containing a 4-digit verification code. Check your external card statement and enter the 4-digit code in the app."
+  },
+  {
+    "id": "FAQ-virtual_card_not_working",
+    "type": "FAQ",
+    "intent": "virtual_card_not_working",
+    "title": "Fixing Virtual Card Issues",
+    "text": "If your virtual card fails online, ensure the card is not frozen, verify that online transactions are enabled in card settings, and check that the 3D Secure push notification is confirmed in your banking app."
+  },
+  {
+    "id": "FAQ-visa_or_mastercard",
+    "type": "FAQ",
+    "intent": "visa_or_mastercard",
+    "title": "Card Network Brand Assignment",
+    "text": "Card network brands (Visa or Mastercard) are assigned based on regional issuing infrastructure and stock availability. Both networks offer identical global consumer protection, merchant acceptance, and chip security."
+  },
+  {
+    "id": "POL-why_verify_identity",
+    "type": "POLICY",
+    "intent": "why_verify_identity",
+    "title": "Legal Purpose of Identity Verification",
+    "text": "Identity verification is an obligatory legal mandate under Anti-Money Laundering (AML) and Counter-Terrorist Financing (CTF) international regulations designed to safeguard financial systems against financial crime."
+  },
+  {
+    "id": "POL-wrong_amount_of_cash_received",
+    "type": "POLICY",
+    "intent": "wrong_amount_of_cash_received",
+    "title": "ATM Cash Dispense Discrepancy Dispute",
+    "text": "If an ATM dispensed less cash than debited on your account, retain the ATM transaction receipt and note the exact terminal machine number. File an ATM dispense discrepancy claim within 14 days."
+  },
+  {
+    "id": "POL-wrong_exchange_rate_for_cash_withdrawal",
+    "type": "POLICY",
+    "intent": "wrong_exchange_rate_for_cash_withdrawal",
+    "title": "ATM Dynamic Currency Conversion (DCC)",
+    "text": "When withdrawing cash abroad, ATM terminals often offer to convert currency on your behalf using their own rate (Dynamic Currency Conversion). Always decline ATM conversion and choose to be billed in local currency to receive our interbank rate."
+  }
+]

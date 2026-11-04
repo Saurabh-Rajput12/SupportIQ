@@ -19,7 +19,7 @@
         <div class="brand-icon">S</div>
         <div>
           <h1>SupportIQ</h1>
-          <span class="brand-badge">MCA NLP Pipeline</span>
+          <span class="brand-badge">RAG GenAI Copilot</span>
         </div>
       </div>
 
@@ -396,7 +396,11 @@
           <div class="form-group">
             <label class="form-label" for="promptStrategy">Select Prompt Engineering Strategy</label>
             <select id="promptStrategy" name="promptStrategy" class="select-field w-100">
-              <option value="FEW_SHOT" selected>FEW_SHOT (3 Exemplar Customer Support Pairs)</option>
+              <option value="INSTRUCTIONAL" selected>INSTRUCTIONAL (Direct & Grounded in Company Knowledge)</option>
+              <option value="CONVERSATIONAL">CONVERSATIONAL (Warm & Reassuring Support Style)</option>
+              <option value="COT">COT (Chain-of-Thought Step-by-Step Reasoning)</option>
+              <option value="SELF_CONSISTENCY">SELF_CONSISTENCY (Multi-Sample Consensus Sampling)</option>
+              <option value="FEW_SHOT">FEW_SHOT (3 Exemplar Customer Support Pairs)</option>
               <option value="ZERO_SHOT">ZERO_SHOT (Direct Task Instruction + Context)</option>
               <option value="STRUCTURED">STRUCTURED (Explicit Sections & Bounded Output)</option>
             </select>

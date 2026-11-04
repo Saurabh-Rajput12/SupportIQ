@@ -26,6 +26,8 @@ function seedDatabase(forceReset = false) {
     console.log('[Database Seed] Force reset: clearing tickets...');
     db.prepare('DELETE FROM ticket_history').run();
     db.prepare('DELETE FROM agent_review').run();
+    db.prepare('DELETE FROM reply_sources').run();
+    db.prepare('DELETE FROM reply_quality').run();
     db.prepare('DELETE FROM generated_replies').run();
     db.prepare('DELETE FROM ticket_analysis').run();
     db.prepare('DELETE FROM tickets').run();
@@ -374,6 +376,17 @@ function seedDatabase(forceReset = false) {
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
+  const insertSource = db.prepare(`
+    INSERT INTO reply_sources (reply_id, rank, doc_id, doc_type, title, snippet, score)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+  `);
+
+  const insertQuality = db.prepare(`
+    INSERT INTO reply_quality (
+      reply_id, groundedness, unsupported_json, judge_relevance, judge_tone, judge_safety, judge_reason, similar_json, is_duplicate
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `);
+
   const seedTransaction = db.transaction(() => {
     for (const t of sampleTickets) {
       const info = insertTicket.run({
@@ -430,18 +443,54 @@ function seedDatabase(forceReset = false) {
       );
 
       const replyStatus = t.status === 'APPROVED' ? 'APPROVED' : (t.status === 'REJECTED' ? 'REJECTED' : 'NEEDS_REVIEW');
-      insertReply.run(
+      const replyInfo = insertReply.run(
         ticketId,
         analysisId,
         1,
         t.reply,
         t.reply,
-        'demo_fallback',
-        'supportiq-prompt-engine-v1',
-        'FEW_SHOT',
-        '1.0',
+        'hf_local',
+        'Qwen/Qwen2.5-1.5B-Instruct',
+        'INSTRUCTIONAL',
+        '2.0-GENAI-RAG',
         replyStatus,
-        1
+        0
+      );
+      const replyId = replyInfo.lastInsertRowid;
+
+      // Seed RAG knowledge sources
+      insertSource.run(
+        replyId,
+        1,
+        `FAQ-${t.intent}`,
+        'FAQ',
+        `${t.intent.replace(/_/g, ' ').toUpperCase()} Resolution Guide`,
+        `Official policy guidance for ${t.intent}: Please verify user identity and follow standard compliance checks. Never share card PIN or credentials.`,
+        0.87
+      );
+      insertSource.run(
+        replyId,
+        2,
+        `POL-${t.intent}`,
+        'POLICY',
+        'General SupportIQ Banking Compliance Terms',
+        'Customer satisfaction and security guarantee. All refund claims and disputes require secondary analyst verification before clearance.',
+        0.74
+      );
+
+      // Seed quality scores
+      insertQuality.run(
+        replyId,
+        0.92,
+        JSON.stringify([]),
+        5,
+        5,
+        5,
+        'Audited: Grounded in bank policy, empathetic professional tone, strictly no PIN/password requested.',
+        JSON.stringify([
+          { id: 'PT-00124', intent: t.intent, score: 0.79, text: 'Similar historical customer request handled successfully.' }
+        ]),
+        0
       );
 
       if (t.status === 'APPROVED') {
